@@ -1,0 +1,162 @@
+@import './variables.scss';
+
+// 全局样式重置
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  height: 100%;
+}
+
+// 通用布局类
+.page-container {
+  padding: $spacing-xl;
+  background-color: $background-color-base;
+  min-height: calc(100vh - #{$header-height});
+}
+
+.filter-container {
+  margin-bottom: $spacing-lg;
+  
+  .el-card__body {
+    padding: $spacing-lg $spacing-xl;
+  }
+}
+
+.table-container {
+  .el-card__body {
+    padding: $spacing-xl;
+  }
+}
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  
+  .left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+  
+  .right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacing-lg;
+}
+
+// 表单样式
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+}
+
+// 筛选区多行布局
+.multi-line-filter-form {
+  .filter-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing-lg;
+    
+    &:last-child {
+      margin-bottom: 0;
+      justify-content: flex-start;
+    }
+  }
+  
+  .el-form-item {
+    margin-bottom: 0;
+    margin-right: $spacing-xl;
+  }
+  
+  .filter-buttons {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+}
+
+// 响应式布局
+@media (max-width: 768px) {
+  .page-container {
+    padding: $spacing-md;
+  }
+  
+  .filter-line {
+    flex-wrap: wrap;
+    
+    > * {
+      margin-bottom: $spacing-md;
+      width: 100% !important;
+    }
+  }
+  
+  .el-form-item {
+    margin-right: 0;
+  }
+  
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-md;
+  }
+}
+
+// 工具类
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}

@@ -1,0 +1,325 @@
+/* Element Plus 全局样式重置 */
+:root {
+  /* 字体系统 */
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  /* 基础颜色 - 使用 Element Plus CSS 变量 */
+  color: var(--el-text-color-primary);
+  background-color: var(--el-bg-color);
+  
+  /* 字体渲染优化 */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 全局重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 链接样式 */
+a {
+  color: var(--el-color-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--el-color-primary-light-3);
+}
+
+/* 页面基础样式 */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--el-bg-color-page);
+  color: var(--el-text-color-primary);
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Element Plus 组件样式优化 */
+.el-card {
+  border-radius: var(--el-border-radius-base);
+  box-shadow: var(--el-box-shadow-light);
+  transition: box-shadow 0.2s;
+}
+
+.el-card:hover {
+  box-shadow: var(--el-box-shadow);
+}
+
+.el-button {
+  border-radius: var(--el-border-radius-base);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.el-input {
+  border-radius: var(--el-border-radius-base);
+}
+
+.el-select {
+  border-radius: var(--el-border-radius-base);
+}
+
+.el-date-editor {
+  border-radius: var(--el-border-radius-base);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--el-fill-color-lighter);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--el-fill-color-dark);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--el-fill-color-darker);
+}
+
+/* 页面布局类 */
+.page-container {
+  padding: 20px;
+  background-color: var(--el-bg-color-page);
+  min-height: calc(100vh - 60px);
+}
+
+/* 筛选区域样式 */
+.filter-container {
+  margin-bottom: 16px;
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+}
+
+.filter-container .el-card__body {
+  padding: 16px 20px;
+}
+
+.multi-line-filter-form .filter-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.multi-line-filter-form .filter-line:last-child {
+  margin-bottom: 0;
+  justify-content: flex-start;
+}
+
+.multi-line-filter-form .el-form-item {
+  margin-bottom: 0;
+  margin-right: 20px;
+}
+
+.filter-buttons {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.filter-buttons .el-button + .el-button {
+  margin-left: 12px;
+}
+
+/* 表格区域样式 */
+.table-container {
+  background-color: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+}
+
+.table-container .el-card__body {
+  padding: 0;
+}
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  background-color: var(--el-fill-color-extra-light);
+}
+
+.table-toolbar .left {
+  display: flex;
+  align-items: center;
+}
+
+.table-toolbar .left .el-button + .el-button {
+  margin-left: 12px;
+}
+
+.table-toolbar .right {
+  display: flex;
+  align-items: center;
+}
+
+/* 分页器样式 */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid var(--el-border-color-lighter);
+  background-color: var(--el-fill-color-extra-light);
+}
+
+/* 表单样式 */
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.form-buttons .el-button + .el-button {
+  margin-left: 12px;
+}
+
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 工具类 - 使用 Element Plus 标准间距 */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* 外边距工具类 */
+.m-0 { margin: 0; }
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.m-3 { margin: 12px; }
+.m-4 { margin: 16px; }
+.m-5 { margin: 20px; }
+.m-6 { margin: 24px; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+.mt-6 { margin-top: 24px; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-5 { margin-bottom: 20px; }
+.mb-6 { margin-bottom: 24px; }
+
+.ml-0 { margin-left: 0; }
+.ml-1 { margin-left: 4px; }
+.ml-2 { margin-left: 8px; }
+.ml-3 { margin-left: 12px; }
+.ml-4 { margin-left: 16px; }
+.ml-5 { margin-left: 20px; }
+.ml-6 { margin-left: 24px; }
+
+.mr-0 { margin-right: 0; }
+.mr-1 { margin-right: 4px; }
+.mr-2 { margin-right: 8px; }
+.mr-3 { margin-right: 12px; }
+.mr-4 { margin-right: 16px; }
+.mr-5 { margin-right: 20px; }
+.mr-6 { margin-right: 24px; }
+
+/* 内边距工具类 */
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.p-5 { padding: 20px; }
+.p-6 { padding: 24px; }
+
+.pt-0 { padding-top: 0; }
+.pt-1 { padding-top: 4px; }
+.pt-2 { padding-top: 8px; }
+.pt-3 { padding-top: 12px; }
+.pt-4 { padding-top: 16px; }
+.pt-5 { padding-top: 20px; }
+.pt-6 { padding-top: 24px; }
+
+.pb-0 { padding-bottom: 0; }
+.pb-1 { padding-bottom: 4px; }
+.pb-2 { padding-bottom: 8px; }
+.pb-3 { padding-bottom: 12px; }
+.pb-4 { padding-bottom: 16px; }
+.pb-5 { padding-bottom: 20px; }
+.pb-6 { padding-bottom: 24px; }
+
+.pl-0 { padding-left: 0; }
+.pl-1 { padding-left: 4px; }
+.pl-2 { padding-left: 8px; }
+.pl-3 { padding-left: 12px; }
+.pl-4 { padding-left: 16px; }
+.pl-5 { padding-left: 20px; }
+.pl-6 { padding-left: 24px; }
+
+.pr-0 { padding-right: 0; }
+.pr-1 { padding-right: 4px; }
+.pr-2 { padding-right: 8px; }
+.pr-3 { padding-right: 12px; }
+.pr-4 { padding-right: 16px; }
+.pr-5 { padding-right: 20px; }
+.pr-6 { padding-right: 24px; }
+
+/* 响应式工具类 */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .page-container {
+    padding: 16px;
+  }
+  
+  .filter-container .el-card__body {
+    padding: 12px 16px;
+  }
+  
+  .table-toolbar {
+    padding: 12px 16px;
+  }
+  
+  .pagination-container {
+    padding: 12px 16px;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-hidden {
+    display: none !important;
+  }
+}
