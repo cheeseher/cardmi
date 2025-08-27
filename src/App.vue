@@ -161,6 +161,14 @@ const handleUserMenuCommand = (command) => {
   background-color: transparent;
 }
 
+.el-menu .el-sub-menu__title span {
+  color: #bfcbd9 !important;
+}
+
+.el-menu .el-sub-menu__title .el-icon {
+  color: #bfcbd9 !important;
+}
+
 .el-menu .el-menu-item.is-active {
   background-color: var(--el-color-primary);
   color: #ffffff;
@@ -170,6 +178,10 @@ const handleUserMenuCommand = (command) => {
 .el-menu .el-sub-menu__title:hover {
   background-color: #263445;
   color: #ffffff;
+}
+
+.el-menu .el-sub-menu__title:hover .el-icon {
+  color: #ffffff !important;
 }
 
 .el-menu .el-sub-menu .el-menu-item {
