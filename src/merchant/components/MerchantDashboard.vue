@@ -21,6 +21,10 @@
             <el-icon><DocumentCopy /></el-icon>
             <span>提卡记录</span>
           </el-menu-item>
+          <el-menu-item index="reset-password">
+            <el-icon><Lock /></el-icon>
+            <span>重置密码</span>
+          </el-menu-item>
         </el-menu>
       </el-scrollbar>
     </el-aside>
@@ -77,6 +81,7 @@ import {
 import MerchantProductManagement from './MerchantProductManagement.vue'
 import ProductStatistics from './ProductStatistics.vue'
 import WithdrawalRecords from './WithdrawalRecords.vue'
+import ResetPassword from './ResetPassword.vue'
 
 // 商户信息状态
 const merchantInfo = ref({
@@ -123,6 +128,7 @@ const components = {
   'product-management': MerchantProductManagement,
   'order-management': ProductStatistics,
   'withdrawal-records': WithdrawalRecords,
+  'reset-password': ResetPassword,
   // 其他组件可以后续添加
 }
 
@@ -131,6 +137,7 @@ const menuTitles = {
   'order-management': '产品统计',
   'balance-management': '余额管理',
   'withdrawal-records': '提卡记录',
+  'reset-password': '重置密码',
   'api-docs': 'API文档',
   'account-settings': '账户设置',
   'security-settings': '安全设置'
@@ -156,7 +163,8 @@ const handleUserMenuCommand = (command) => {
       ElMessage.info('个人资料功能开发中...')
       break
     case 'reset-password':
-      ElMessage.info('修改密码功能开发中...')
+      activeMenu.value = 'reset-password'
+      currentComponent.value = ResetPassword
       break
     case 'logout':
       ElMessage.success('退出登录成功')

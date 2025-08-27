@@ -1,75 +1,146 @@
 <template>
-  <div class="order-management">
+  <div class="page-container">
     <!-- 筛选区域 -->
     <el-card shadow="never" class="filter-container">
       <el-form :model="filterForm" inline class="multi-line-filter-form">
+        <!-- 第一行筛选项 -->
         <div class="filter-line">
-          <el-form-item label="订单编号：" prop="orderNumber">
+          <el-form-item label="订单号：" prop="orderNo">
             <el-input
-              v-model="filterForm.orderNumber"
-              placeholder="请输入订单编号"
+              v-model="filterForm.orderNo"
+              placeholder="请输入订单号"
               clearable
-              style="width: 200px"
+              style="width: 220px"
             />
           </el-form-item>
           
-          <el-form-item label="客户ID：" prop="customerId">
-            <el-input
-              v-model="filterForm.customerId"
-              placeholder="请输入客户ID"
+          <el-form-item label="产品：" prop="productName">
+            <el-select
+              v-model="filterForm.productName"
+              placeholder="请选择产品"
               clearable
               style="width: 168px"
-            />
+            >
+              <el-option label="联通充值卡" value="联通充值卡" />
+              <el-option label="移动充值卡" value="移动充值卡" />
+              <el-option label="电信充值卡" value="电信充值卡" />
+            </el-select>
           </el-form-item>
           
-          <el-form-item label="客户邮箱：" prop="customerEmail">
-            <el-input
-              v-model="filterForm.customerEmail"
-              placeholder="请输入客户邮箱"
+          <el-form-item label="交易状态：" prop="transactionStatus">
+            <el-select
+              v-model="filterForm.transactionStatus"
+              placeholder="请选择交易状态"
               clearable
-              style="width: 200px"
+              style="width: 168px"
+            >
+              <el-option label="处理成功" value="success" />
+              <el-option label="处理中" value="processing" />
+              <el-option label="处理失败" value="failed" />
+            </el-select>
+          </el-form-item>
+          
+          <el-form-item label="核销状态：" prop="verificationStatus">
+            <el-select
+              v-model="filterForm.verificationStatus"
+              placeholder="请选择核销状态"
+              clearable
+              style="width: 168px"
+            >
+              <el-option label="已核销" value="verified" />
+              <el-option label="未核销" value="unverified" />
+              <el-option label="已锁定" value="locked" />
+            </el-select>
+          </el-form-item>
+          
+          <el-form-item label="商户号：" prop="merchantCode">
+            <el-input
+              v-model="filterForm.merchantCode"
+              placeholder="请输入商户号"
+              clearable
+              style="width: 168px"
             />
           </el-form-item>
         </div>
         
+        <!-- 第二行筛选项 -->
         <div class="filter-line">
-          <el-form-item label="订单状态：" prop="orderStatus">
-            <el-select
-              v-model="filterForm.orderStatus"
-              placeholder="请选择状态"
-              clearable
-              style="width: 168px"
-            >
-              <el-option label="全部" value="" />
-              <el-option label="待支付" value="pending" />
-              <el-option label="已支付" value="paid" />
-              <el-option label="已完成" value="completed" />
-              <el-option label="已取消" value="cancelled" />
-            </el-select>
-          </el-form-item>
-          
-          <el-form-item label="创建时间：" prop="dateRange">
+          <el-form-item label="提卡时间：" prop="withdrawalTime">
             <el-date-picker
-              v-model="filterForm.dateRange"
-              type="daterange"
+              v-model="filterForm.withdrawalTime"
+              type="datetimerange"
               range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD"
-              style="width: 240px"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DD HH:mm:ss"
+              style="width: 350px"
             />
           </el-form-item>
           
+          <el-form-item label="商户单号：" prop="merchantOrderNo">
+            <el-input
+              v-model="filterForm.merchantOrderNo"
+              placeholder="请输入商户单号"
+              clearable
+              style="width: 220px"
+            />
+          </el-form-item>
+          
+          <el-form-item label="系统单号：" prop="systemOrderNo">
+            <el-input
+              v-model="filterForm.systemOrderNo"
+              placeholder="请输入系统单号"
+              clearable
+              style="width: 220px"
+            />
+          </el-form-item>
+          
+          <el-form-item label="商户名称：" prop="merchantName">
+            <el-input
+              v-model="filterForm.merchantName"
+              placeholder="请输入商户名称"
+              clearable
+              style="width: 168px"
+            />
+          </el-form-item>
+        </div>
+        
+        <!-- 第三行筛选项 -->
+        <div class="filter-line">
+          <el-form-item label="面值：" prop="faceValue">
+            <el-select
+              v-model="filterForm.faceValue"
+              placeholder="请选择面值"
+              clearable
+              style="width: 168px"
+            >
+              <el-option label="10元" value="10" />
+              <el-option label="20元" value="20" />
+              <el-option label="30元" value="30" />
+              <el-option label="50元" value="50" />
+              <el-option label="100元" value="100" />
+            </el-select>
+          </el-form-item>
+        </div>
+        
+        <!-- 第四行筛选项 -->
+        <div class="filter-line">
+          <el-form-item label="卡号：" prop="cardNo">
+            <el-input
+              v-model="filterForm.cardNo"
+              type="textarea"
+              placeholder="请输入卡号，多个卡号请换行分隔"
+              :rows="3"
+              :autosize="{ minRows: 3, maxRows: 6 }"
+              style="width: 300px"
+            />
+          </el-form-item>
+          
+          <!-- 操作按钮组，靠右对齐 -->
           <div class="filter-buttons">
-            <el-button type="primary" @click="handleSearch" :loading="searchLoading">
-              <el-icon><Search /></el-icon>
-              查询
-            </el-button>
-            <el-button plain @click="handleReset">
-              <el-icon><Refresh /></el-icon>
-              重置
-            </el-button>
+            <el-button type="primary" @click="handleFilter" :loading="searchLoading">查询</el-button>
+            <el-button plain @click="resetFilter">重置</el-button>
           </div>
         </div>
       </el-form>
@@ -79,18 +150,25 @@
     <el-card>
       <!-- 表格工具栏 -->
       <div class="table-toolbar">
-        <el-space>
-          <el-button type="primary" @click="handleAdd">
-            <el-icon><Plus /></el-icon>
-            新增订单
+        <div class="toolbar-left">
+          <el-button 
+            type="primary" 
+            :disabled="!canLockSelected"
+            @click="handleLockCard"
+          >
+            锁卡 ({{ lockableCount }})
           </el-button>
-
-        </el-space>
-        <el-tooltip content="刷新数据">
-          <el-button circle @click="handleRefresh" :loading="tableLoading">
-            <el-icon><Refresh /></el-icon>
+          <el-button 
+            type="warning" 
+            :disabled="!canUnlockSelected"
+            @click="handleUnlockCard"
+          >
+            解锁 ({{ unlockableCount }})
           </el-button>
-        </el-tooltip>
+        </div>
+        <div class="toolbar-right">
+          <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
+        </div>
       </div>
       
       <!-- 表格 -->
@@ -99,322 +177,397 @@
         border
         stripe
         v-loading="tableLoading"
+        style="margin-top: 16px; width: 100%"
         @selection-change="handleSelectionChange"
-        style="width: 100%"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="orderId" label="订单ID" width="90" show-overflow-tooltip />
-        <el-table-column prop="orderNumber" label="订单编号" width="160" show-overflow-tooltip />
-        <el-table-column prop="customerInfo" label="客户信息" width="180">
+        
+        <el-table-column prop="orderNo" label="订单号" min-width="180">
           <template #default="{ row }">
-            <div class="customer-info">
-              <div class="customer-id">ID: {{ row.customerId }}</div>
-              <div class="customer-email">{{ row.customerEmail }}</div>
+            <div class="order-info">
+              <div class="order-id">{{ row.orderNo }}</div>
+              <div class="system-id">{{ row.systemId }}</div>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="productName" label="商品名称" width="120" show-overflow-tooltip />
-        <el-table-column prop="orderAmount" label="订单金额" width="110" sortable align="right">
+        
+        <el-table-column prop="merchantInfo" label="商户信息" min-width="200">
           <template #default="{ row }">
-            <span style="color: var(--el-color-primary); font-weight: 500;">¥{{ parseFloat(row.orderAmount).toLocaleString() }}</span>
+            <div class="merchant-info">
+              <div class="merchant-id">{{ row.merchantId }}</div>
+              <div class="merchant-code">{{ row.merchantCode }}</div>
+              <div class="merchant-name">{{ row.merchantName }}</div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="orderStatus" label="订单状态" width="90" align="center">
+        
+        <el-table-column prop="productName" label="产品" min-width="150">
+          <template #default="{ row, $index }">
+            <span>产品{{ String.fromCharCode(65 + $index) }}-[{{ row.faceValue }}]</span>
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="cardInfo" label="卡密" min-width="200">
           <template #default="{ row }">
-            <el-tag
-              :type="getStatusType(row.orderStatus)"
+            <div class="card-info">
+              <div class="card-number">{{ row.cardNumber }}</div>
+              <div class="card-password">{{ row.cardPassword }}</div>
+            </div>
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="transactionAmount" label="交易金额" min-width="100">
+          <template #default="{ row }">
+            ¥{{ row.transactionAmount }}
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="transactionQuantity" label="交易数量" min-width="100" />
+        
+        <el-table-column prop="transactionStatus" label="交易状态" min-width="120">
+          <template #default="{ row }">
+            <el-tag 
+              :type="getTransactionStatusType(row.transactionStatus)"
+              size="small"
             >
-              {{ getStatusText(row.orderStatus) }}
+              {{ getTransactionStatusText(row.transactionStatus) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="cardPackage" label="卡包信息" width="120" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="下单时间" width="160" sortable />
-        <el-table-column label="操作" width="220" fixed="right">
+        
+        <el-table-column prop="withdrawalTime" label="提卡时间" min-width="160" />
+        
+        <el-table-column prop="verificationStatus" label="核销状态" min-width="120">
           <template #default="{ row }">
-            <el-button link :icon="View" @click="handleViewDetail(row)">查看</el-button>
-            <el-button link type="primary" :icon="Edit" @click="handleEdit(row)">编辑</el-button>
-            <el-popconfirm 
-              title="确认删除该订单？" 
-              @confirm="handleDelete(row)"
-              confirm-button-text="确定"
-              cancel-button-text="取消"
+            <el-tag 
+              :type="getVerificationStatusType(row.verificationStatus)"
+              size="small"
             >
-              <template #reference>
-                <el-button link type="danger" :icon="Delete">删除</el-button>
-              </template>
-            </el-popconfirm>
+              {{ getVerificationStatusText(row.verificationStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        
+        <el-table-column label="锁卡开关" min-width="100" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-switch
+              :model-value="row.verificationStatus === 'locked'"
+              :disabled="row.verificationStatus === 'verified'"
+              @change="(value) => handleSwitchChange(row, value)"
+              active-text=""
+              inactive-text=""
+              :active-color="row.verificationStatus === 'verified' ? '#C0C4CC' : '#13CE66'"
+              :inactive-color="row.verificationStatus === 'verified' ? '#C0C4CC' : '#DCDFE6'"
+            />
+          </template>
+        </el-table-column>
+        
+        <el-table-column prop="withdrawalTimestamp" label="核销时间" min-width="180">
+          <template #default="{ row }">
+            {{ formatTimestamp(row.withdrawalTimestamp) }}
           </template>
         </el-table-column>
       </el-table>
       
-      <!-- 分页器 -->
+      <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="pagination.currentPage"
           v-model:page-size="pagination.pageSize"
           :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
           :total="pagination.total"
-          layout="total, sizes, prev, pager, next"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
       </div>
     </el-card>
-
-    <!-- 订单详情弹窗 -->
-    <el-dialog
-      v-model="detailDialogVisible"
-      title="订单详情"
-      width="700px"
-      :before-close="handleCloseDetail"
-      destroy-on-close
-    >
-      <div v-if="currentOrder">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="订单ID">
-            <el-text tag="b">{{ currentOrder.orderId }}</el-text>
-          </el-descriptions-item>
-          <el-descriptions-item label="订单编号">
-            <el-text tag="b">{{ currentOrder.orderNumber }}</el-text>
-          </el-descriptions-item>
-          <el-descriptions-item label="客户ID">
-            {{ currentOrder.customerId }}
-          </el-descriptions-item>
-          <el-descriptions-item label="客户邮箱">
-            {{ currentOrder.customerEmail }}
-          </el-descriptions-item>
-          <el-descriptions-item label="商品名称">
-            {{ currentOrder.productName }}
-          </el-descriptions-item>
-          <el-descriptions-item label="订单金额">
-            <el-text type="primary" size="large" tag="b">¥{{ parseFloat(currentOrder.orderAmount).toLocaleString() }}</el-text>
-          </el-descriptions-item>
-          <el-descriptions-item label="订单状态">
-            <el-tag :type="getStatusType(currentOrder.orderStatus)" size="large">
-              {{ getStatusText(currentOrder.orderStatus) }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="卡包信息">
-            {{ currentOrder.cardPackage }}
-          </el-descriptions-item>
-          <el-descriptions-item label="下单时间" :span="2">
-            {{ currentOrder.createTime }}
-          </el-descriptions-item>
-        </el-descriptions>
-      </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="handleCloseDetail">关闭</el-button>
-          <el-button type="primary" @click="handleEditFromDetail">编辑订单</el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <!-- 编辑订单弹窗 -->
-    <el-dialog
-      v-model="editDialogVisible"
-      :title="editForm.orderNumber ? '编辑订单' : '新增订单'"
-      width="600px"
-      :before-close="handleCloseEdit"
-      destroy-on-close
-    >
-      <el-form
-        ref="editFormRef"
-        :model="editForm"
-        :rules="editRules"
-        label-width="100px"
-        label-position="right"
-      >
-        <el-form-item label="订单编号" prop="orderNumber" v-if="editForm.orderNumber">
-          <el-input v-model="editForm.orderNumber" disabled />
-        </el-form-item>
-        <el-form-item label="订单状态" prop="orderStatus" required>
-          <el-select v-model="editForm.orderStatus" placeholder="请选择状态" style="width: 100%">
-            <el-option label="待支付" value="pending" />
-            <el-option label="已支付" value="paid" />
-            <el-option label="已完成" value="completed" />
-            <el-option label="已取消" value="cancelled" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input
-            v-model="editForm.remark"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入备注信息"
-            maxlength="200"
-            show-word-limit
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="handleCloseEdit">取消</el-button>
-          <el-button type="primary" @click="handleSaveEdit" :loading="saveLoading">
-            {{ editForm.orderNumber ? '保存' : '创建' }}
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { 
-  Search, 
-  Refresh, 
-  Plus, 
-  Delete, 
-  Download, 
-  View, 
-  Edit 
-} from '@element-plus/icons-vue'
+import { Refresh } from '@element-plus/icons-vue'
 
 // 响应式数据
 const tableLoading = ref(false)
 const searchLoading = ref(false)
-const detailDialogVisible = ref(false)
-const editDialogVisible = ref(false)
-const saveLoading = ref(false)
-const currentOrder = ref(null)
-const editFormRef = ref(null)
 const selectedRows = ref([])
 
 // 筛选表单
 const filterForm = reactive({
-  orderNumber: '',
-  customerId: '',
-  customerEmail: '',
-  orderStatus: '',
-  orderValue: '',
-  cardNumber: '',
-  dateRange: []
+  orderNo: '',
+  productName: '',
+  transactionStatus: '',
+  verificationStatus: '',
+  withdrawalTime: [],
+  merchantOrderNo: '',
+  systemOrderNo: '',
+  faceValue: '',
+  cardNo: '',
+  merchantCode: '',
+  merchantName: ''
 })
 
 // 分页数据
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 10,
-  total: 3
+  pageSize: 20,
+  total: 0
 })
 
-// 编辑表单
-const editForm = reactive({
-  orderNumber: '',
-  orderStatus: '',
-  remark: ''
+// 计算属性
+const canLockSelected = computed(() => {
+  return selectedRows.value.some(row => row.verificationStatus !== 'verified' && row.verificationStatus !== 'locked')
 })
 
-// 表单验证规则
-const editRules = {
-  orderStatus: [{ required: true, message: '请选择订单状态', trigger: 'change' }]
-}
+const canUnlockSelected = computed(() => {
+  return selectedRows.value.some(row => row.verificationStatus === 'locked')
+})
+
+const lockableCount = computed(() => {
+  return selectedRows.value.filter(row => row.verificationStatus !== 'verified' && row.verificationStatus !== 'locked').length
+})
+
+const unlockableCount = computed(() => {
+  return selectedRows.value.filter(row => row.verificationStatus === 'locked').length
+})
 
 // 表格数据
 const tableData = ref([
   {
-    orderId: '1001',
-    orderNumber: 'ORD202502251001',
-    customerId: '1001',
-    customerEmail: 'user1@example.com',
-    productName: '电话卡',
-    orderAmount: '10.00',
-    orderStatus: 'completed',
-    cardPackage: 'test',
-    createTime: '2025-02-25 18:30:15'
+    id: 1,
+    orderNo: 'ORD20241201001',
+    systemId: 'SYS001',
+    productName: 'Steam充值卡',
+    cardNumber: '1234-5678-9012-3456',
+    cardPassword: 'ABC123DEF456',
+    transactionAmount: 100.00,
+    transactionQuantity: 1,
+    transactionStatus: 'success',
+    withdrawalTime: '2024-12-01 10:30:00',
+    verificationStatus: 'verified',
+    withdrawalTimestamp: 1733025000,
+    faceValue: 100
   },
   {
-    orderId: '1002',
-    orderNumber: 'ORD202502251002',
-    customerId: '1002',
-    customerEmail: 'user2@example.com',
-    productName: '电话卡',
-    orderAmount: '20.00',
-    orderStatus: 'paid',
-    cardPackage: 'test2',
-    createTime: '2025-02-25 18:25:30'
-  },
-  {
-    orderId: '1003',
-    orderNumber: 'ORD202502251003',
-    customerId: '1003',
-    customerEmail: 'user3@example.com',
-    productName: '电话卡',
-    orderAmount: '50.00',
-    orderStatus: 'pending',
-    cardPackage: 'test3',
-    createTime: '2025-02-25 18:20:45'
+    id: 2,
+    orderNo: 'ORD20241201002',
+    systemId: 'SYS002',
+    productName: 'Apple Store充值卡',
+    cardNumber: '9876-5432-1098-7654',
+    cardPassword: 'XYZ789GHI012',
+    transactionAmount: 50.00,
+    transactionQuantity: 1,
+    transactionStatus: 'processing',
+    withdrawalTime: '2024-12-01 11:15:00',
+    verificationStatus: 'unverified',
+    withdrawalTimestamp: 1733027700,
+    faceValue: 50
   }
 ])
 
 // 更新分页总数
 pagination.total = tableData.value.length
 
-// 获取状态类型
-const getStatusType = (status) => {
+// 辅助函数
+const getTransactionStatusType = (status) => {
   const statusMap = {
-    pending: 'warning',
-    paid: 'info',
-    completed: 'success',
-    cancelled: 'danger'
+    'success': 'success',
+    'processing': 'warning',
+    'failed': 'danger'
   }
   return statusMap[status] || 'info'
 }
 
-// 获取状态文本
-const getStatusText = (status) => {
+const getTransactionStatusText = (status) => {
   const statusMap = {
-    pending: '待支付',
-    paid: '已支付',
-    completed: '已完成',
-    cancelled: '已取消'
+    'success': '处理成功',
+    'processing': '处理中',
+    'failed': '处理失败'
   }
-  return statusMap[status] || '未知'
+  return statusMap[status] || '未知状态'
+}
+
+const getVerificationStatusType = (status) => {
+  const statusMap = {
+    'verified': 'success',
+    'unverified': 'warning',
+    'locked': 'danger'
+  }
+  return statusMap[status] || 'info'
+}
+
+const getVerificationStatusText = (status) => {
+  const statusMap = {
+    'verified': '已核销',
+    'unverified': '未核销',
+    'locked': '已锁定'
+  }
+  return statusMap[status] || '未知状态'
+}
+
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return '-'
+  return new Date(timestamp).toLocaleString('zh-CN')
+}
+
+// 数据加载
+const loadTableData = async () => {
+  try {
+    tableLoading.value = true
+    
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // 模拟数据筛选
+    let filteredData = mockTableData
+    
+    // 多卡号筛选
+    if (filterForm.cardNo && filterForm.cardNo.trim()) {
+      const cardNumbers = filterForm.cardNo
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+      
+      if (cardNumbers.length > 0) {
+        filteredData = filteredData.filter(item => 
+          cardNumbers.some(cardNo => 
+            item.cardNumber && item.cardNumber.includes(cardNo)
+          )
+        )
+      }
+    }
+    
+    // 其他筛选条件
+    if (filterForm.orderNo) {
+      filteredData = filteredData.filter(item => 
+        item.orderNo && item.orderNo.includes(filterForm.orderNo)
+      )
+    }
+    
+    if (filterForm.productName) {
+      filteredData = filteredData.filter(item => 
+        item.productName && item.productName.includes(filterForm.productName)
+      )
+    }
+    
+    if (filterForm.transactionStatus) {
+      filteredData = filteredData.filter(item => 
+        item.transactionStatus === filterForm.transactionStatus
+      )
+    }
+    
+    if (filterForm.verificationStatus) {
+      filteredData = filteredData.filter(item => 
+        item.verificationStatus === filterForm.verificationStatus
+      )
+    }
+    
+    if (filterForm.merchantOrderNo) {
+      filteredData = filteredData.filter(item => 
+        item.merchantOrderNo && item.merchantOrderNo.includes(filterForm.merchantOrderNo)
+      )
+    }
+    
+    if (filterForm.systemOrderNo) {
+      filteredData = filteredData.filter(item => 
+        item.systemId && item.systemId.includes(filterForm.systemOrderNo)
+      )
+    }
+    
+    if (filterForm.faceValue) {
+      filteredData = filteredData.filter(item => 
+        item.faceValue && item.faceValue.toString().includes(filterForm.faceValue)
+      )
+    }
+    
+    if (filterForm.merchantCode) {
+      filteredData = filteredData.filter(item => 
+        item.merchantCode && item.merchantCode.includes(filterForm.merchantCode)
+      )
+    }
+    
+    if (filterForm.merchantName) {
+      filteredData = filteredData.filter(item => 
+        item.merchantName && item.merchantName.includes(filterForm.merchantName)
+      )
+    }
+    
+    // 分页处理
+    pagination.total = filteredData.length
+    const start = (pagination.currentPage - 1) * pagination.pageSize
+    const end = start + pagination.pageSize
+    tableData.value = filteredData.slice(start, end)
+    
+  } catch (error) {
+    console.error('加载数据失败:', error)
+    ElMessage.error('加载数据失败')
+  } finally {
+    tableLoading.value = false
+  }
 }
 
 // 方法
-const handleSearch = async () => {
-  searchLoading.value = true
+const handleFilter = async () => {
+  pagination.currentPage = 1
+  await loadTableData()
+}
+
+const resetFilter = () => {
+  Object.assign(filterForm, {
+    orderNo: '',
+    productName: '',
+    transactionStatus: '',
+    verificationStatus: '',
+    withdrawalTime: [],
+    merchantOrderNo: '',
+    systemOrderNo: '',
+    faceValue: '',
+    cardNo: ''
+  })
+  pagination.currentPage = 1
+  loadTableData()
+}
+
+const handleRefresh = async () => {
+  await loadTableData()
+}
+
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection
+}
+
+const handleSwitchChange = async (row, value) => {
   try {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 800))
-    // 执行查询逻辑
-    ElMessage.success('查询成功')
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    row.verificationStatus = value ? 'locked' : 'unverified'
+    ElMessage.success(value ? '锁卡成功' : '解锁成功')
   } catch (error) {
-    ElMessage.error('查询失败，请重试')
-  } finally {
-    searchLoading.value = false
+    // 恢复开关状态
+    ElMessage.error(value ? '锁卡失败' : '解锁失败')
   }
 }
 
-const handleReset = () => {
-  Object.keys(filterForm).forEach(key => {
-    if (key === 'dateRange') {
-      filterForm[key] = []
-    } else {
-      filterForm[key] = ''
-    }
-  })
-  ElMessage.info('筛选条件已重置')
-}
-
-const handleAdd = () => {
-  Object.assign(editForm, {
-    orderNumber: '',
-    orderStatus: '',
-    remark: ''
-  })
-  editDialogVisible.value = true
-}
-
-const handleBatchDelete = async () => {
+const handleLockCard = async () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要锁卡的记录')
+    return
+  }
+  
+  const lockableRows = selectedRows.value.filter(row => row.verificationStatus !== 'verified' && row.verificationStatus !== 'locked')
+  if (lockableRows.length === 0) {
+    ElMessage.warning('选中的记录中没有可锁卡的项目')
+    return
+  }
+  
   try {
     await ElMessageBox.confirm(
-      `确认删除选中的 ${selectedRows.value.length} 条订单？`,
-      '批量删除确认',
+      `确定要锁定选中的 ${lockableRows.length} 张卡吗？`,
+      '批量锁卡确认',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -422,104 +575,58 @@ const handleBatchDelete = async () => {
       }
     )
     
-    // 执行批量删除逻辑
-    ElMessage.success(`成功删除 ${selectedRows.value.length} 条订单`)
-    selectedRows.value = []
-  } catch {
-    ElMessage.info('已取消删除')
-  }
-}
-
-const handleExport = () => {
-  ElMessage.info('导出功能开发中...')
-}
-
-const handleRefresh = async () => {
-  tableLoading.value = true
-  try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    ElMessage.success('数据已刷新')
-  } finally {
-    tableLoading.value = false
-  }
-}
-
-const handleSelectionChange = (selection) => {
-  selectedRows.value = selection
-}
-
-const handleViewDetail = (row) => {
-  currentOrder.value = { ...row }
-  detailDialogVisible.value = true
-}
-
-const handleEdit = (row) => {
-  currentOrder.value = { ...row }
-  editForm.orderNumber = row.orderNumber
-  editForm.orderStatus = row.orderStatus
-  editForm.remark = ''
-  editDialogVisible.value = true
-}
-
-const handleEditFromDetail = () => {
-  if (currentOrder.value) {
-    Object.assign(editForm, {
-      orderNumber: currentOrder.value.orderNumber,
-      orderStatus: currentOrder.value.orderStatus,
-      remark: ''
-    })
-    detailDialogVisible.value = false
-    editDialogVisible.value = true
-  }
-}
-
-const handleDelete = async (row) => {
-  try {
-    // 删除订单
-    ElMessage.success('订单删除成功')
-    // 这里可以添加删除逻辑
-  } catch (error) {
-    ElMessage.error('删除失败，请重试')
-  }
-}
-
-const handleCloseDetail = () => {
-  detailDialogVisible.value = false
-  currentOrder.value = null
-}
-
-const handleCloseEdit = () => {
-  editDialogVisible.value = false
-  currentOrder.value = null
-  if (editFormRef.value) {
-    editFormRef.value.resetFields()
-  }
-}
-
-const handleSaveEdit = async () => {
-  if (!editFormRef.value) return
-  
-  try {
-    await editFormRef.value.validate()
-    saveLoading.value = true
-    
-    // 模拟保存操作
+    // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 1000))
     
-    // 保存订单成功
-    editDialogVisible.value = false
+    lockableRows.forEach(row => {
+      row.verificationStatus = 'locked'
+    })
     
-    const action = editForm.orderNumber ? '更新' : '创建'
-    ElMessage.success(`订单${action}成功`)
-    
-    // 重置表单
-    if (editFormRef.value) {
-      editFormRef.value.resetFields()
-    }
+    ElMessage.success(`成功锁定 ${lockableRows.length} 张卡`)
+    selectedRows.value = []
   } catch (error) {
-    // 表单验证失败
-  } finally {
-    saveLoading.value = false
+    if (error !== 'cancel') {
+      ElMessage.error('批量锁卡失败')
+    }
+  }
+}
+
+const handleUnlockCard = async () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要解锁的记录')
+    return
+  }
+  
+  const unlockableRows = selectedRows.value.filter(row => row.verificationStatus === 'locked')
+  if (unlockableRows.length === 0) {
+    ElMessage.warning('选中的记录中没有可解锁的项目')
+    return
+  }
+  
+  try {
+    await ElMessageBox.confirm(
+      `确定要解锁选中的 ${unlockableRows.length} 张卡吗？`,
+      '批量解锁确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    unlockableRows.forEach(row => {
+      row.verificationStatus = 'unverified'
+    })
+    
+    ElMessage.success(`成功解锁 ${unlockableRows.length} 张卡`)
+    selectedRows.value = []
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('批量解锁失败')
+    }
   }
 }
 
@@ -527,26 +634,88 @@ const handleSaveEdit = async () => {
 const handleSizeChange = (val) => {
   pagination.pageSize = val
   pagination.currentPage = 1
-  handleSearch()
+  loadTableData()
 }
 
 // 当前页改变
 const handleCurrentChange = (val) => {
   pagination.currentPage = val
-  handleSearch()
+  loadTableData()
 }
+
+// 模拟数据
+const mockTableData = [
+  {
+    id: 1,
+    orderNo: 'ORD20241201001',
+    systemId: 'SYS001',
+    productName: 'Steam充值卡',
+    cardNumber: '1234-5678-9012-3456',
+    cardPassword: 'ABC123DEF456',
+    transactionAmount: 100.00,
+    transactionQuantity: 1,
+    transactionStatus: 'success',
+    withdrawalTime: '2024-12-01 10:30:00',
+    verificationStatus: 'verified',
+    withdrawalTimestamp: 1733025000,
+    faceValue: 100,
+    merchantOrderNo: 'MERCH001',
+    systemOrderNo: 'SYS001',
+    merchantId: 'M001',
+    merchantCode: 'MC001',
+    merchantName: '阿里巴巴'
+  },
+  {
+    id: 2,
+    orderNo: 'ORD20241201002',
+    systemId: 'SYS002',
+    productName: 'Apple Store充值卡',
+    cardNumber: '9876-5432-1098-7654',
+    cardPassword: 'XYZ789GHI012',
+    transactionAmount: 50.00,
+    transactionQuantity: 1,
+    transactionStatus: 'processing',
+    withdrawalTime: '2024-12-01 11:15:00',
+    verificationStatus: 'unverified',
+    withdrawalTimestamp: 1733027700,
+    faceValue: 50,
+    merchantOrderNo: 'MERCH002',
+    systemOrderNo: 'SYS002',
+    merchantId: 'M002',
+    merchantCode: 'MC002',
+    merchantName: '腾讯科技'
+  },
+  {
+    id: 3,
+    orderNo: 'ORD20241201003',
+    systemId: 'SYS003',
+    productName: 'Google Play充值卡',
+    cardNumber: '1111-2222-3333-4444',
+    cardPassword: 'DEF456GHI789',
+    transactionAmount: 30.00,
+    transactionQuantity: 1,
+    transactionStatus: 'success',
+    withdrawalTime: '2024-12-01 12:00:00',
+    verificationStatus: 'locked',
+    withdrawalTimestamp: 1733030400,
+    faceValue: 30,
+    merchantOrderNo: 'MERCH003',
+    systemOrderNo: 'SYS003',
+    merchantId: 'M003',
+    merchantCode: 'MC003',
+    merchantName: '字节跳动'
+  }
+]
 
 // 组件挂载时加载数据
 onMounted(() => {
-  handleSearch()
+  loadTableData()
 })
 </script>
 
 <style scoped>
-.order-management {
-  padding: var(--el-padding-large);
-  background-color: var(--el-bg-color-page);
-  min-height: 100vh;
+.withdrawal-records {
+  padding: 20px;
 }
 
 .filter-container {
@@ -579,29 +748,174 @@ onMounted(() => {
   margin-left: 12px;
 }
 
+.table-container {
+  background: #fff;
+}
+
 .table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  padding: 16px;
+  background: #fff;
 }
 
 .table-toolbar .left {
   display: flex;
-  align-items: center;
   gap: 12px;
 }
 
 .table-toolbar .right {
   display: flex;
-  align-items: center;
   gap: 12px;
+  align-items: center;
 }
 
 .pagination-container {
-  margin-top: var(--el-margin-large);
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.status-tag {
+  font-weight: 500;
+}
+
+.amount-text {
+  font-weight: 600;
+  color: #409eff;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.table-actions .el-button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.card-numbers-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.lock-switch {
+  display: flex;
+  justify-content: center;
+}
+
+/* 时间戳信息样式 */
+.timestamp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timestamp-value {
+  font-size: 12px;
+  color: #909399;
+  font-family: 'Courier New', monospace;
+}
+
+.timestamp-readable {
+  font-size: 13px;
+  color: #606266;
+}
+
+/* 订单信息样式 */
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-id {
+  font-weight: 500;
+  color: #303133;
+}
+
+.system-id {
+  font-size: 12px;
+  color: #909399;
+}
+
+.merchant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.merchant-id {
+  font-weight: 500;
+  color: #303133;
+  font-size: 12px;
+}
+
+.merchant-code {
+  font-size: 12px;
+  color: #606266;
+}
+
+.merchant-name {
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 卡片信息样式 */
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-number {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #303133;
+}
+
+.card-password {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 响应式处理 */
+@media (max-width: 768px) {
+  .filter-container {
+    padding: 12px;
+  }
+  
+  .multi-line-filter-form .filter-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .multi-line-filter-form .el-form-item {
+    margin-right: 0;
+    margin-bottom: 12px;
+    width: 100%;
+  }
+  
+  .filter-buttons {
+    margin-left: 0;
+    margin-top: 12px;
+    width: 100%;
+  }
+  
+  .table-toolbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .table-toolbar .left,
+  .table-toolbar .right {
+    width: 100%;
+  }
 }
 
 .customer-info {

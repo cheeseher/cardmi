@@ -170,6 +170,14 @@
           />
         </el-form-item>
         
+        <el-form-item label="产品名称" prop="productName">
+          <el-input
+            v-model="editForm.productName"
+            placeholder="请输入产品名称"
+            clearable
+          />
+        </el-form-item>
+        
         <el-form-item label="产品面值" prop="faceValue">
           <el-radio-group v-model="editForm.faceValue">
             <el-radio value="10">10元</el-radio>
@@ -265,6 +273,7 @@ const editForm = reactive({
 })
 
 const editFormRules = {
+  productName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
   faceValue: [{ required: true, message: '请选择商品面值', trigger: 'change' }]
 }
 

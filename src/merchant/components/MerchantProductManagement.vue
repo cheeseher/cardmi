@@ -63,13 +63,13 @@
         style="width: 100%"
         height="400"
       >
-        <el-table-column prop="productName" label="产品" min-width="200">
+        <el-table-column prop="productName" label="产品名称" min-width="200">
           <template #default="{ row }">
             <span class="product-name">{{ row.productName }}</span>
           </template>
         </el-table-column>
         
-        <el-table-column prop="productCode" label="产品代码" min-width="150" />
+        <el-table-column prop="productCode" label="产品编码" min-width="150" />
         
         <el-table-column prop="rate" label="费率" min-width="120" align="center">
           <template #default="{ row }">
@@ -84,13 +84,52 @@
         </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- IP白名单设置弹窗 -->
+    <el-dialog
+      v-model="ipWhitelistDialogVisible"
+      title="设置IP白名单"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="ipWhitelistFormRef"
+        :model="ipWhitelistForm"
+        :rules="ipWhitelistRules"
+        label-width="100px"
+        label-position="top"
+      >
+        <el-form-item label="IP地址列表" prop="ipList">
+          <el-input
+            v-model="ipWhitelistForm.ipList"
+            type="textarea"
+            :rows="6"
+            placeholder="请输入IP地址，多个IP地址之间用英文逗号(,)分隔&#10;&#10;示例：192.168.1.1,192.168.1.2,10.0.0.1"
+            clearable
+          />
+          <div class="form-tip">
+            <el-text type="info" size="small">
+              <el-icon><InfoFilled /></el-icon>
+              多个IP地址之间请用英文逗号(,)分隔，支持IPv4格式
+            </el-text>
+          </div>
+        </el-form-item>
+      </el-form>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="handleCancelIpWhitelist">取消</el-button>
+          <el-button type="primary" @click="handleConfirmIpWhitelist">确认</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { CopyDocument } from '@element-plus/icons-vue'
+import { CopyDocument, InfoFilled } from '@element-plus/icons-vue'
 
 // 接收商户信息
 const props = defineProps({
@@ -123,52 +162,68 @@ const merchantInfo = computed(() => {
 // 产品费率数据
 const productRateData = ref([
   {
-    productName: '星话卡-[10]',
-    productCode: 'xingyk',
+    productName: '产品A-[10]',
+    productCode: 'PD1001',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 10,
+    productId: 'PD1001'
   },
   {
-    productName: '星话卡-[20]',
-    productCode: 'xingyk',
+    productName: '产品A-[20]',
+    productCode: 'PD1002',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 20,
+    productId: 'PD1002'
   },
   {
-    productName: '星话卡-[30]',
-    productCode: 'xingyk',
+    productName: '产品A-[30]',
+    productCode: 'PD1003',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 30,
+    productId: 'PD1003'
   },
   {
-    productName: '星话卡-[50]',
-    productCode: 'xingyk',
+    productName: '产品B-[50]',
+    productCode: 'PD1004',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 50,
+    productId: 'PD1004'
   },
   {
-    productName: '星话卡-[100]',
-    productCode: 'xingyk',
+    productName: '产品B-[100]',
+    productCode: 'PD1005',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 100,
+    productId: 'PD1005'
   },
   {
-    productName: '星话卡-[200]',
-    productCode: 'xingyk',
+    productName: '产品B-[200]',
+    productCode: 'PD1006',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 200,
+    productId: 'PD1006'
   },
   {
-    productName: '购物卡-[200]',
-    productCode: 'scard',
+    productName: '产品C-[200]',
+    productCode: 'PD1007',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 200,
+    productId: 'PD1007'
   },
   {
-    productName: '购物卡-[100]',
-    productCode: 'scard',
+    productName: '产品C-[100]',
+    productCode: 'PD1008',
     rate: '0.9760',
-    status: '已开启'
+    status: '已开启',
+    faceValue: 100,
+    productId: 'PD1008'
   }
 ])
 
@@ -177,9 +232,75 @@ const handleDownloadApi = () => {
   ElMessage.success('API文档下载中...')
 }
 
+// IP白名单设置弹窗
+const ipWhitelistDialogVisible = ref(false)
+const ipWhitelistForm = reactive({
+  ipList: ''
+})
+const ipWhitelistFormRef = ref()
+
 // 设置IP白名单
 const handleSettings = () => {
-  ElMessage.info('IP白名单设置功能开发中...')
+  // 初始化表单数据
+  ipWhitelistForm.ipList = merchantInfo.value.ipWhitelist || ''
+  ipWhitelistDialogVisible.value = true
+}
+
+// 确认设置IP白名单
+const handleConfirmIpWhitelist = async () => {
+  try {
+    await ipWhitelistFormRef.value.validate()
+    // 这里可以添加API调用来保存IP白名单
+    // await updateIpWhitelist(ipWhitelistForm.ipList)
+    
+    ElMessage.success('IP白名单设置成功')
+    ipWhitelistDialogVisible.value = false
+    
+    // 更新本地显示的IP白名单
+    if (props.merchantInfo) {
+      // 如果有props传入，可以emit事件通知父组件更新
+    } else {
+      // 更新本地数据
+      merchantInfo.value.ipWhitelist = ipWhitelistForm.ipList
+    }
+  } catch (error) {
+    console.error('IP白名单设置失败:', error)
+  }
+}
+
+// 取消设置IP白名单
+const handleCancelIpWhitelist = () => {
+  ipWhitelistDialogVisible.value = false
+  // 重置表单
+  ipWhitelistForm.ipList = ''
+}
+
+// IP白名单表单验证规则
+const ipWhitelistRules = {
+  ipList: [
+    {
+      validator: (rule, value, callback) => {
+        if (!value || value.trim() === '') {
+          callback(new Error('请输入IP地址'))
+          return
+        }
+        
+        // 验证IP地址格式
+        const ips = value.split(',').map(ip => ip.trim()).filter(ip => ip)
+        const ipRegex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+        
+        for (let ip of ips) {
+          if (!ipRegex.test(ip)) {
+            callback(new Error(`IP地址格式不正确: ${ip}`))
+            return
+          }
+        }
+        
+        callback()
+      },
+      trigger: 'blur'
+    }
+  ]
 }
 
 // 复制到剪贴板
@@ -370,5 +491,34 @@ onMounted(() => {
   .action-buttons {
     flex-direction: column;
   }
+}
+
+/* IP白名单弹窗样式 */
+.form-tip {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-tip .el-icon {
+  font-size: 14px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 弹窗内表单样式优化 */
+.el-dialog .el-form-item__label {
+  font-weight: 500;
+  color: #303133;
+}
+
+.el-dialog .el-textarea__inner {
+  resize: vertical;
+  min-height: 120px;
 }
 </style>

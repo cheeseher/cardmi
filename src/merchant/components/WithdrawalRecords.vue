@@ -64,6 +64,60 @@
               style="width: 350px"
             />
           </el-form-item>
+        </div>
+        
+        <!-- 第三行筛选项 -->
+        <div class="filter-line">
+          <el-form-item label="商户单号：" prop="merchantOrderNo">
+            <el-input
+              v-model="filterForm.merchantOrderNo"
+              placeholder="请输入商户单号"
+              clearable
+              style="width: 220px"
+            />
+          </el-form-item>
+          
+          <el-form-item label="系统单号：" prop="systemOrderNo">
+            <el-input
+              v-model="filterForm.systemOrderNo"
+              placeholder="请输入系统单号"
+              clearable
+              style="width: 220px"
+            />
+          </el-form-item>
+        </div>
+        
+        <!-- 第四行筛选项 -->
+        <div class="filter-line">
+          <el-form-item label="面值：" prop="faceValue">
+            <el-select
+              v-model="filterForm.faceValue"
+              placeholder="请选择面值"
+              clearable
+              style="width: 168px"
+            >
+              <el-option label="10元" value="10" />
+              <el-option label="20元" value="20" />
+              <el-option label="30元" value="30" />
+              <el-option label="50元" value="50" />
+              <el-option label="100元" value="100" />
+              <el-option label="200元" value="200" />
+              <el-option label="300元" value="300" />
+            </el-select>
+          </el-form-item>
+          
+          <el-form-item label="卡号：" prop="cardNo">
+            <el-input
+              v-model="filterForm.cardNo"
+              type="textarea"
+              :rows="3"
+              :maxlength="1000"
+              placeholder="请输入卡号，多个卡号请换行分隔"
+              clearable
+              style="width: 220px"
+              resize="none"
+            />
+          </el-form-item>
           
           <!-- 操作按钮组，靠右对齐 -->
           <div class="filter-buttons">
@@ -78,13 +132,23 @@
     <el-card class="table-container" shadow="never">
       <!-- 表格工具栏 -->
       <div class="table-toolbar">
-        <div class="left">
-          <el-button type="primary" @click="handleExport">导出记录</el-button>
-          <el-button type="danger" :disabled="!selectedRows.length" @click="handleBatchDelete">
-            批量删除 ({{ selectedRows.length }})
+        <div class="toolbar-left">
+          <el-button 
+            type="warning" 
+            :disabled="!canLockSelected"
+            @click="handleLockCard"
+          >
+            锁卡{{ lockableCount > 0 ? `(${lockableCount})` : '' }}
+          </el-button>
+          <el-button 
+            type="success" 
+            :disabled="!canUnlockSelected"
+            @click="handleUnlockCard"
+          >
+            解锁{{ unlockableCount > 0 ? `(${unlockableCount})` : '' }}
           </el-button>
         </div>
-        <div class="right">
+        <div class="toolbar-right">
           <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
         </div>
       </div>
@@ -95,8 +159,8 @@
         border 
         stripe
         v-loading="tableLoading"
-        @selection-change="handleSelectionChange"
         style="margin-top: 16px"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
         
@@ -109,7 +173,11 @@
           </template>
         </el-table-column>
         
-        <el-table-column prop="productName" label="产品" min-width="150" />
+        <el-table-column prop="productName" label="产品" min-width="150">
+          <template #default="{ row, $index }">
+            <span>产品{{ String.fromCharCode(65 + $index) }}-[{{ row.faceValue }}]</span>
+          </template>
+        </el-table-column>
         
         <el-table-column prop="cardInfo" label="卡密" min-width="200">
           <template #default="{ row }">
@@ -152,26 +220,23 @@
           </template>
         </el-table-column>
         
-        <el-table-column prop="withdrawalTimestamp" label="提卡时间戳" min-width="180">
+        <el-table-column label="锁卡开关" min-width="100" align="center" fixed="right">
           <template #default="{ row }">
-            <div class="timestamp-info">
-              <div class="timestamp-value">{{ row.withdrawalTimestamp }}</div>
-              <div class="timestamp-readable">{{ formatTimestamp(row.withdrawalTimestamp) }}</div>
-            </div>
+            <el-switch
+              :model-value="row.verificationStatus === 'locked'"
+              :disabled="row.verificationStatus === 'verified'"
+              @change="(value) => handleSwitchChange(row, value)"
+              active-text=""
+              inactive-text=""
+              :active-color="row.verificationStatus === 'verified' ? '#C0C4CC' : '#13CE66'"
+              :inactive-color="row.verificationStatus === 'verified' ? '#C0C4CC' : '#DCDFE6'"
+            />
           </template>
         </el-table-column>
         
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column prop="withdrawalTimestamp" label="核销时间" min-width="180">
           <template #default="{ row }">
-            <el-button link :icon="View" @click="handleView(row)">查看详情</el-button>
-            <el-button 
-              link 
-              type="primary" 
-              :icon="Edit" 
-              @click="handleEdit(row)"
-            >
-              编辑
-            </el-button>
+            {{ formatTimestamp(row.withdrawalTimestamp) }}
           </template>
         </el-table-column>
       </el-table>
@@ -195,7 +260,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { View, Edit, Refresh } from '@element-plus/icons-vue'
+import { Refresh } from '@element-plus/icons-vue'
 
 // 筛选表单
 const filterForm = reactive({
@@ -203,13 +268,39 @@ const filterForm = reactive({
   productName: '',
   transactionStatus: '',
   verificationStatus: '',
-  withdrawalTime: []
+  withdrawalTime: [],
+  merchantOrderNo: '',
+  systemOrderNo: '',
+  faceValue: '',
+  cardNo: ''
 })
 
 // 表格数据
 const tableData = ref([])
 const tableLoading = ref(false)
 const selectedRows = ref([])
+
+// 计算可锁定的数量
+const lockableCount = computed(() => {
+  return selectedRows.value.filter(row => row.verificationStatus === 'unverified').length
+})
+
+// 计算可解锁的数量
+const unlockableCount = computed(() => {
+  return selectedRows.value.filter(row => row.verificationStatus === 'locked').length
+})
+
+// 计算是否可以锁卡
+const canLockSelected = computed(() => {
+  return selectedRows.value.length > 0 && 
+         selectedRows.value.every(row => row.verificationStatus === 'unverified')
+})
+
+// 计算是否可以解锁
+const canUnlockSelected = computed(() => {
+  return selectedRows.value.length > 0 && 
+         selectedRows.value.every(row => row.verificationStatus === 'locked')
+})
 
 // 分页参数
 const pagination = reactive({
@@ -225,6 +316,7 @@ const mockTableData = [
     orderNo: 'B1720300348648058428',
     systemId: '2024073651326773609',
     productName: '联通充值卡 【10元】',
+    faceValue: '10',
     cardNumber: '626816800002319902',
     cardPassword: '••••••••1020',
     transactionAmount: '29.28',
@@ -239,6 +331,7 @@ const mockTableData = [
     orderNo: 'B1720300379060721406',
     systemId: '2024073651326907464',
     productName: '移动充值卡 【20元】',
+    faceValue: '20',
     cardNumber: '654688700000616170',
     cardPassword: '••••••••9934',
     transactionAmount: '19.52',
@@ -253,6 +346,7 @@ const mockTableData = [
     orderNo: 'B1720300352624312456',
     systemId: '2024073651327704814',
     productName: '电信充值卡 【30元】',
+    faceValue: '30',
     cardNumber: '654683000137951548',
     cardPassword: '••••••••7823',
     transactionAmount: '29.28',
@@ -267,6 +361,7 @@ const mockTableData = [
     orderNo: 'B1720300342476025715',
     systemId: '2024073651326876567',
     productName: '联通充值卡 【20元】',
+    faceValue: '20',
     cardNumber: '626816800002319903',
     cardPassword: '••••••••2031',
     transactionAmount: '29.28',
@@ -281,6 +376,7 @@ const mockTableData = [
     orderNo: 'B1720300348367603714',
     systemId: 'V1720300316764341412',
     productName: '移动充值卡 【20元】',
+    faceValue: '20',
     cardNumber: '654688700000616171',
     cardPassword: '••••••••4567',
     transactionAmount: '29.28',
@@ -347,13 +443,71 @@ const formatTimestamp = (timestamp) => {
 }
 
 // 加载表格数据
-const loadTableData = async () => {
+const loadTableData = async (queryParams = null) => {
   tableLoading.value = true
   try {
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, 500))
-    tableData.value = mockTableData
-    pagination.total = mockTableData.length
+    
+    let filteredData = [...mockTableData]
+    
+    // 如果有查询参数，进行筛选
+    if (queryParams) {
+      // 处理多卡号筛选
+      if (queryParams.cardNumbers && queryParams.cardNumbers.length > 0) {
+        filteredData = filteredData.filter(item => 
+          queryParams.cardNumbers.some(cardNo => 
+            item.cardNumber.includes(cardNo)
+          )
+        )
+      }
+      
+      // 处理其他筛选条件
+      if (queryParams.orderNo) {
+        filteredData = filteredData.filter(item => 
+          item.orderNo.includes(queryParams.orderNo)
+        )
+      }
+      
+      if (queryParams.productName) {
+        filteredData = filteredData.filter(item => 
+          item.productName.includes(queryParams.productName)
+        )
+      }
+      
+      if (queryParams.transactionStatus) {
+        filteredData = filteredData.filter(item => 
+          item.transactionStatus === queryParams.transactionStatus
+        )
+      }
+      
+      if (queryParams.verificationStatus) {
+        filteredData = filteredData.filter(item => 
+          item.verificationStatus === queryParams.verificationStatus
+        )
+      }
+      
+      if (queryParams.merchantOrderNo) {
+        filteredData = filteredData.filter(item => 
+          item.orderNo.includes(queryParams.merchantOrderNo)
+        )
+      }
+      
+      if (queryParams.systemOrderNo) {
+        filteredData = filteredData.filter(item => 
+          item.systemId.includes(queryParams.systemOrderNo)
+        )
+      }
+      
+      if (queryParams.faceValue) {
+        filteredData = filteredData.filter(item => 
+          item.faceValue === queryParams.faceValue
+        )
+      }
+    }
+    
+    tableData.value = filteredData
+    pagination.total = filteredData.length
   } catch (error) {
     ElMessage.error('加载数据失败')
   } finally {
@@ -363,8 +517,27 @@ const loadTableData = async () => {
 
 // 筛选查询
 const handleFilter = () => {
+  // 处理多行卡号输入
+  let cardNumbers = []
+  if (filterForm.cardNo && filterForm.cardNo.trim()) {
+    // 将换行符分隔的卡号转换为数组，并去除空行和空格
+    cardNumbers = filterForm.cardNo
+      .split('\n')
+      .map(cardNo => cardNo.trim())
+      .filter(cardNo => cardNo.length > 0)
+  }
+  
+  // 构建查询参数
+  const queryParams = {
+    ...filterForm,
+    cardNumbers: cardNumbers // 将处理后的卡号数组传递给后端
+  }
+  
+  console.log('查询参数:', queryParams)
+  console.log('卡号数组:', cardNumbers)
+  
   // 执行筛选逻辑
-  loadTableData()
+  loadTableData(queryParams)
 }
 
 // 重置筛选
@@ -376,56 +549,125 @@ const resetFilter = () => {
       filterForm[key] = ''
     }
   })
+  // 重置后不传递查询参数，显示所有数据
   loadTableData()
 }
 
-// 表格选择变更
-const handleSelectionChange = (selection) => {
-  selectedRows.value = selection
-}
 
-// 导出记录
-const handleExport = () => {
-  ElMessage.success('导出功能开发中')
-}
-
-// 批量删除
-const handleBatchDelete = () => {
-  if (!selectedRows.value.length) {
-    ElMessage.warning('请选择要删除的记录')
-    return
-  }
-  
-  ElMessageBox.confirm(
-    `确认删除选中的 ${selectedRows.value.length} 条记录？`,
-    '批量删除确认',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    ElMessage.success('删除成功')
-    loadTableData()
-  }).catch(() => {
-    ElMessage.info('已取消删除')
-  })
-}
 
 // 刷新数据
 const handleRefresh = () => {
   loadTableData()
 }
 
-// 查看详情
-const handleView = (row) => {
-  ElMessage.info(`查看订单 ${row.orderNo} 的详情`)
+// 处理表格选择变更
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection
 }
 
-// 编辑记录
-const handleEdit = (row) => {
-  ElMessage.info(`编辑订单 ${row.orderNo}`)
+// 处理单个开关变更
+const handleSwitchChange = async (row, value) => {
+  const action = value ? '锁定' : '解锁'
+  const confirmText = `确认${action}该卡密？`
+  
+  try {
+    await ElMessageBox.confirm(
+      confirmText,
+      `${action}确认`,
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // 更新状态
+    row.verificationStatus = value ? 'locked' : 'unverified'
+    
+    ElMessage.success(`${action}成功`)
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(`${action}操作失败`)
+    }
+  }
 }
+
+// 锁卡操作
+const handleLockCard = async () => {
+  if (!canLockSelected.value) {
+    ElMessage.warning('请选择未核销状态的记录进行锁定')
+    return
+  }
+  
+  const lockableRows = selectedRows.value.filter(row => row.verificationStatus === 'unverified')
+  
+  try {
+    await ElMessageBox.confirm(
+      `确认锁定选中的 ${lockableRows.length} 条记录？`,
+      '锁卡确认',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // 更新状态
+    lockableRows.forEach(row => {
+      row.verificationStatus = 'locked'
+    })
+    
+    ElMessage.success(`成功锁定 ${lockableRows.length} 条记录`)
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('锁卡操作失败')
+    }
+  }
+}
+
+// 解锁操作
+const handleUnlockCard = async () => {
+  if (!canUnlockSelected.value) {
+    ElMessage.warning('请选择已锁定状态的记录进行解锁')
+    return
+  }
+  
+  const unlockableRows = selectedRows.value.filter(row => row.verificationStatus === 'locked')
+  
+  try {
+    await ElMessageBox.confirm(
+      `确认解锁选中的 ${unlockableRows.length} 条记录？`,
+      '解锁确认',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // 更新状态
+    unlockableRows.forEach(row => {
+      row.verificationStatus = 'unverified'
+    })
+    
+    ElMessage.success(`成功解锁 ${unlockableRows.length} 条记录`)
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('解锁操作失败')
+    }
+  }
+}
+
+
 
 // 分页大小变更
 const handleSizeChange = (size) => {
@@ -469,6 +711,17 @@ onMounted(() => {
 .multi-line-filter-form .el-form-item {
   margin-bottom: 0;
   margin-right: 20px;
+  align-items: flex-start;
+}
+
+/* 多行文本框样式调整 */
+.multi-line-filter-form .el-form-item .el-textarea {
+  vertical-align: top;
+}
+
+.multi-line-filter-form .el-form-item .el-textarea .el-textarea__inner {
+  min-height: 72px;
+  line-height: 1.4;
 }
 
 .filter-buttons {
@@ -487,16 +740,13 @@ onMounted(() => {
   align-items: center;
 }
 
-.table-toolbar .left {
+.toolbar-left {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
-.table-toolbar .left .el-button + .el-button {
-  margin-left: 12px;
-}
-
-.table-toolbar .right {
+.toolbar-right {
   display: flex;
   align-items: center;
 }
@@ -556,18 +806,11 @@ onMounted(() => {
   }
   
   .table-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .table-toolbar .left,
-  .table-toolbar .right {
     justify-content: center;
-    margin-bottom: 12px;
   }
   
-  .table-toolbar .right {
-    margin-bottom: 0;
+  .toolbar-right {
+    justify-content: center;
   }
 }
 </style>
