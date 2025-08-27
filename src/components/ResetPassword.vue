@@ -1,12 +1,5 @@
 <template>
   <div class="reset-password">
-    <!-- 标签栏 -->
-    <el-card class="tabs-card">
-      <el-tabs v-model="activeTab" type="card">
-        <el-tab-pane label="重置密码" name="resetPassword" />
-      </el-tabs>
-    </el-card>
-
     <!-- 密码修改表单 -->
     <div class="form-container">
       <el-card class="form-card">
@@ -64,9 +57,6 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-
-// 标签栏状态
-const activeTab = ref('resetPassword')
 
 // 表单引用
 const passwordFormRef = ref()
@@ -155,10 +145,6 @@ const handleReset = () => {
   padding: var(--el-padding-large);
   background-color: var(--el-bg-color-page);
   min-height: 100vh;
-}
-
-.tabs-card {
-  margin-bottom: var(--el-margin-large);
 }
 
 .form-container {

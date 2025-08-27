@@ -2,7 +2,7 @@
   <el-container class="layout-container">
     <el-aside width="200px" class="layout-aside">
       <div class="layout-logo">
-        <span>卡密管理系统</span>
+        <span>产品管理系统</span>
       </div>
       <el-scrollbar>
         <el-menu
@@ -19,7 +19,7 @@
           </el-menu-item>
           <el-menu-item index="cards">
             <el-icon><CreditCard /></el-icon>
-            <span>卡密管理</span>
+            <span>卡密产品管理</span>
           </el-menu-item>
           <el-menu-item index="orders">
             <el-icon><Document /></el-icon>
@@ -182,6 +182,78 @@ const handleUserMenuCommand = (command) => {
 
 .el-menu .el-sub-menu__title:hover .el-icon {
   color: #ffffff !important;
+}
+
+.el-menu .el-sub-menu__title .el-sub-menu__icon-arrow {
+  color: #bfcbd9 !important;
+}
+
+.el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow {
+  color: #ffffff !important;
+}
+
+/* 确保SVG图标颜色正确显示 - 使用最强选择器和内联样式级别的优先级 */
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow {
+  color: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow {
+  color: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* 最强选择器确保SVG路径元素颜色正确 */
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow svg path {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow svg path {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* 针对所有可能的SVG子元素，使用最高优先级 */
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow svg *,
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow svg *,
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* 使用属性选择器进一步加强 */
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow[class*="icon"] svg,
+.layout-container .layout-aside .el-menu .el-sub-menu__title .el-sub-menu__icon-arrow[class*="icon"] svg * {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow[class*="icon"] svg,
+.layout-container .layout-aside .el-menu .el-sub-menu__title:hover .el-sub-menu__icon-arrow[class*="icon"] svg * {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 .el-menu .el-sub-menu .el-menu-item {

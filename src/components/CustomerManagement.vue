@@ -10,7 +10,16 @@
               v-model="filterForm.customerId"
               placeholder="请输入客户ID"
               clearable
-              style="width: 200px"
+              style="width: 180px"
+            />
+          </el-form-item>
+          
+          <el-form-item label="商户号：" prop="merchantNo">
+            <el-input
+              v-model="filterForm.merchantNo"
+              placeholder="请输入商户号"
+              clearable
+              style="width: 180px"
             />
           </el-form-item>
           
@@ -19,7 +28,7 @@
               v-model="filterForm.customerName"
               placeholder="请输入昵称"
               clearable
-              style="width: 200px"
+              style="width: 180px"
             />
           </el-form-item>
           
@@ -28,7 +37,7 @@
               v-model="filterForm.customerEmail"
               placeholder="请输入邮箱"
               clearable
-              style="width: 220px"
+              style="width: 200px"
             />
           </el-form-item>
         </div>
@@ -78,7 +87,15 @@
 
     <!-- 表格区域 -->
     <el-card>
-
+      <!-- 工具栏 -->
+      <div class="table-toolbar">
+        <div class="left">
+          <el-button type="primary" @click="handleAddCustomer">
+            <el-icon><Plus /></el-icon>
+            新增客户
+          </el-button>
+        </div>
+      </div>
       
       <!-- 表格 -->
       <el-table
@@ -91,6 +108,17 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="customerId" label="客户ID" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="merchantNo" label="商户号" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="merchantKey" label="商户密钥" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: monospace; font-size: 12px;">{{ row.merchantKey }}</span>
+              <el-button type="primary" link size="small" @click="copyMerchantKey(row.merchantKey)">
+                <el-icon><CopyDocument /></el-icon>
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="customerName" label="客户昵称" min-width="150" show-overflow-tooltip />
         <el-table-column prop="customerEmail" label="客户邮箱" min-width="220" show-overflow-tooltip />
         <el-table-column prop="balance" label="余额" min-width="120" sortable>
@@ -106,6 +134,30 @@
           </template>
         </el-table-column>
         <el-table-column prop="registerTime" label="注册时间" min-width="180" sortable />
+        <el-table-column label="操作" width="220" fixed="right">
+          <template #default="{ row }">
+            <el-button link type="primary" @click="handleView(row)">
+              <el-icon><View /></el-icon>
+              查看
+            </el-button>
+            <el-button link type="primary" @click="handleEditCustomer(row)">
+              <el-icon><Edit /></el-icon>
+              编辑
+            </el-button>
+            <el-button link @click="handleViewBalance(row)">
+              <el-icon><Money /></el-icon>
+              余额详情
+            </el-button>
+            <el-popconfirm title="确认删除该客户？" @confirm="handleDeleteCustomer(row)">
+              <template #reference>
+                <el-button link type="danger">
+                  <el-icon><Delete /></el-icon>
+                  删除
+                </el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
 
       </el-table>
 
@@ -136,6 +188,30 @@
         label-width="100px"
         label-position="right"
       >
+        <el-form-item label="商户号" prop="merchantNo">
+          <el-input
+            v-model="addForm.merchantNo"
+            placeholder="系统自动生成"
+            readonly
+            style="background-color: #ffffff;"
+          >
+            <template #append>
+              <el-button @click="generateMerchantNo" :icon="Refresh" />
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="商户密钥" prop="merchantKey">
+          <el-input
+            v-model="addForm.merchantKey"
+            placeholder="系统自动生成"
+            readonly
+            style="background-color: #ffffff;"
+          >
+            <template #append>
+              <el-button @click="generateMerchantKey" :icon="Refresh" />
+            </template>
+          </el-input>
+        </el-form-item>
         <el-form-item label="客户昵称" prop="customerName">
           <el-input
             v-model="addForm.customerName"
@@ -301,7 +377,8 @@ import {
   Download, 
   Upload,
   View, 
-  Edit 
+  Edit,
+  CopyDocument 
 } from '@element-plus/icons-vue'
 
 // 响应式数据
@@ -312,6 +389,7 @@ const selectedRows = ref([])
 // 筛选表单
 const filterForm = reactive({
   customerId: '',
+  merchantNo: '',
   customerName: '',
   customerEmail: '',
   status: '',
@@ -322,6 +400,8 @@ const filterForm = reactive({
 const tableData = ref([
   {
     customerId: '1001',
+    merchantNo: 'M17408123456',
+    merchantKey: 'test_key_1234567890abcdef1234567890abcdef',
     customerName: 'asd',
     customerEmail: '123@qq.com',
     balance: '9.900',
@@ -330,6 +410,8 @@ const tableData = ref([
   },
   {
     customerId: '1002',
+    merchantNo: 'M17408234567',
+    merchantKey: 'test_key_abcdef1234567890abcdef1234567890',
     customerName: 'aaa',
     customerEmail: '888@gmail.com',
     balance: '0.000',
@@ -338,6 +420,8 @@ const tableData = ref([
   },
   {
     customerId: '1003',
+    merchantNo: 'M17408345678',
+    merchantKey: 'test_key_9876543210fedcba9876543210fedcba',
     customerName: 'bbb',
     customerEmail: '999@gmail.com',
     balance: '0.000',
@@ -357,12 +441,16 @@ const pagination = reactive({
 const addDialogVisible = ref(false)
 const addFormRef = ref()
 const addForm = reactive({
+  merchantNo: '',
+  merchantKey: '',
   customerName: '',
   customerEmail: '',
   balance: ''
 })
 
 const addFormRules = {
+  merchantNo: [{ required: true, message: '商户号不能为空', trigger: 'blur' }],
+  merchantKey: [{ required: true, message: '商户密钥不能为空', trigger: 'blur' }],
   customerName: [{ required: true, message: '请输入客户昵称', trigger: 'blur' }],
   customerEmail: [{ required: true, message: '请输入客户邮箱', trigger: 'blur' }]
 }
@@ -437,6 +525,7 @@ const handleSearch = async () => {
 const handleReset = () => {
   Object.assign(filterForm, {
     customerId: '',
+    merchantNo: '',
     customerName: '',
     customerEmail: '',
     status: '',
@@ -492,13 +581,46 @@ const handleView = (row) => {
   ElMessage.info('查看功能开发中...')
 }
 
+// 生成商户号的函数
+const generateMerchantNo = () => {
+  const timestamp = Date.now().toString()
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+  addForm.merchantNo = `M${timestamp.slice(-8)}${random}`
+}
+
+// 生成商户密钥的函数
+const generateMerchantKey = () => {
+  const prefix = 'test_key_'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = prefix
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  addForm.merchantKey = result
+}
+
+// 复制商户密钥到剪贴板
+const copyMerchantKey = async (key) => {
+  try {
+    await navigator.clipboard.writeText(key)
+    ElMessage.success('商户密钥已复制到剪贴板')
+  } catch (error) {
+    ElMessage.error('复制失败，请手动复制')
+  }
+}
+
 const handleAddCustomer = () => {
   addDialogVisible.value = true
   Object.assign(addForm, {
+    merchantNo: '',
+    merchantKey: '',
     customerName: '',
     customerEmail: '',
     balance: ''
   })
+  // 自动生成商户号和商户密钥
+  generateMerchantNo()
+  generateMerchantKey()
 }
 
 const handleAddConfirm = async () => {
