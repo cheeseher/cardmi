@@ -311,12 +311,12 @@ const notificationForm = reactive({
   emailNotification: true,
   smtpHost: 'smtp.qq.com',
   smtpPort: 587,
-  senderEmail: '',
-  emailPassword: '',
+  senderEmail: 'YOUR_EMAIL_HERE',
+  emailPassword: 'YOUR_EMAIL_PASSWORD_HERE',
   smsNotification: false,
   smsProvider: '',
-  smsAccessKey: '',
-  smsSecretKey: '',
+  smsAccessKey: 'YOUR_SMS_ACCESS_KEY_HERE',
+  smsSecretKey: 'YOUR_SMS_SECRET_KEY_HERE',
   notificationTypes: ['login', 'system']
 })
 

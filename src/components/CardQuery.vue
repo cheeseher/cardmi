@@ -102,7 +102,7 @@ const filterForm = reactive({
 const tableData = ref([
   {
     cardNumber: '939684006576672442',
-    password: 'p60wXO8T',
+    password: '********',
     orderNumber: 'sf174047748858929',
     customerId: '1001',
     status: '已使用',
@@ -111,7 +111,7 @@ const tableData = ref([
   },
   {
     cardNumber: '736779794793920531',
-    password: 'pXSi3Y20',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -120,7 +120,7 @@ const tableData = ref([
   },
   {
     cardNumber: '679706886397601293',
-    password: 'ASXKK8D7',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -129,7 +129,7 @@ const tableData = ref([
   },
   {
     cardNumber: '762829251215552704',
-    password: 'XmJUg6eO',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -138,7 +138,7 @@ const tableData = ref([
   },
   {
     cardNumber: '332906932136546258',
-    password: 'jzWOEfI',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -147,7 +147,7 @@ const tableData = ref([
   },
   {
     cardNumber: '613038240784082504',
-    password: 'E8ca7Mpw',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -156,7 +156,7 @@ const tableData = ref([
   },
   {
     cardNumber: '550864709398981014',
-    password: 'jMSMZj2',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -165,7 +165,7 @@ const tableData = ref([
   },
   {
     cardNumber: '752222246573346743',
-    password: 'DXE7gTt8',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',
@@ -174,7 +174,7 @@ const tableData = ref([
   },
   {
     cardNumber: '688099941296756970',
-    password: 'Mre8h3Mc',
+    password: '********',
     orderNumber: '',
     customerId: '1002',
     status: '未使用',

@@ -80,7 +80,7 @@ const loginLoading = ref(false)
 // 登录表单数据
 const loginForm = reactive({
   username: 'admin',
-  password: '123456',
+  password: 'YOUR_PASSWORD_HERE',
   remember: false
 })
 
@@ -110,7 +110,7 @@ const handleLogin = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
     
     // 验证用户名密码
-    if (loginForm.username === 'admin' && loginForm.password === '123456') {
+    if (loginForm.username === 'admin' && loginForm.password === 'YOUR_PASSWORD_HERE') {
       // 设置用户信息
       userStore.setUserInfo({
         id: 1,

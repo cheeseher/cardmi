@@ -590,7 +590,7 @@ const generateMerchantNo = () => {
 
 // 生成商户密钥的函数
 const generateMerchantKey = () => {
-  const prefix = 'test_key_'
+  const prefix = 'merchant_key_'
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let result = prefix
   for (let i = 0; i < 32; i++) {
