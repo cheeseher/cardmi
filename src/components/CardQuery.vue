@@ -46,11 +46,11 @@
         v-loading="tableLoading"
         style="width: 100%"
       >
-        <el-table-column prop="cardNumber" label="卡号" width="200" />
-        <el-table-column prop="password" label="密码" width="120" />
-        <el-table-column prop="orderNumber" label="订单编号" width="180" />
-        <el-table-column prop="customerId" label="客户ID" width="100" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="cardNumber" label="卡号" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="password" label="密码" min-width="120" />
+        <el-table-column prop="orderNumber" label="订单编号" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="customerId" label="客户ID" min-width="100" />
+        <el-table-column prop="status" label="状态" min-width="100">
           <template #default="{ row }">
             <el-tag
               :type="row.status === '已使用' ? 'success' : row.status === '未使用' ? '' : 'warning'"
@@ -59,19 +59,13 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="productValue" label="商品面值" width="100">
+        <el-table-column prop="productValue" label="商品面值" min-width="120">
           <template #default="{ row }">
             <span style="color: var(--el-color-warning); font-weight: 500;">{{ row.productValue }}元</span>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column label="操作" width="100" fixed="right">
-          <template #default="{ row }">
-            <el-button link :icon="CopyDocument" @click="handleCopy(row)" class="action-btn">
-              <span>复制</span>
-            </el-button>
-          </template>
-        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" min-width="180" />
+
       </el-table>
       
       <!-- 分页器 -->
@@ -93,7 +87,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Search, Refresh, CopyDocument } from '@element-plus/icons-vue'
+import { Search, Refresh } from '@element-plus/icons-vue'
 
 
 
@@ -230,11 +224,7 @@ const handleCurrentChange = (val) => {
   handleSearch()
 }
 
-// 复制功能
-const handleCopy = (row) => {
-  navigator.clipboard.writeText(row.cardNumber + '\t' + row.password)
-  ElMessage.success('复制成功')
-}
+
 
 // 组件挂载时加载数据
 onMounted(() => {

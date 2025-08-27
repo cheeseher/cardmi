@@ -78,34 +78,7 @@
 
     <!-- 表格区域 -->
     <el-card>
-      <!-- 表格工具栏 -->
-      <div class="table-toolbar">
-        <div class="left">
-          <el-button type="primary" @click="handleAddCustomer">
-            <el-icon><Plus /></el-icon>
-            新增客户
-          </el-button>
-          <el-button type="danger" @click="handleBatchDelete" :disabled="!selectedRows.length">
-            <el-icon><Delete /></el-icon>
-            批量删除
-          </el-button>
-          <el-button @click="handleExport">
-            <el-icon><Download /></el-icon>
-            导出数据
-          </el-button>
-          <el-button @click="handleImport">
-            <el-icon><Upload /></el-icon>
-            导入客户
-          </el-button>
-        </div>
-        <div class="right">
-          <el-tooltip content="刷新数据">
-            <el-button circle @click="handleRefresh" :loading="tableLoading">
-              <el-icon><Refresh /></el-icon>
-            </el-button>
-          </el-tooltip>
-        </div>
-      </div>
+
       
       <!-- 表格 -->
       <el-table
@@ -117,43 +90,23 @@
         style="width: 100%"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="customerId" label="客户ID" width="120" show-overflow-tooltip />
-        <el-table-column prop="customerName" label="客户昵称" width="150" show-overflow-tooltip />
-        <el-table-column prop="customerEmail" label="客户邮箱" width="220" show-overflow-tooltip />
-        <el-table-column prop="balance" label="余额" width="120" sortable>
+        <el-table-column prop="customerId" label="客户ID" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="customerName" label="客户昵称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="customerEmail" label="客户邮箱" min-width="220" show-overflow-tooltip />
+        <el-table-column prop="balance" label="余额" min-width="120" sortable>
           <template #default="{ row }">
             <span style="color: var(--el-color-primary); font-weight: 500;">¥{{ parseFloat(row.balance).toLocaleString() }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" min-width="100">
           <template #default="{ row }">
             <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
               {{ row.status === 'active' ? '正常' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="registerTime" label="注册时间" width="180" sortable />
-        <el-table-column label="操作" width="240" fixed="right">
-          <template #default="{ row }">
-            <el-space>
-              <el-button link :icon="View" @click="handleView(row)">查看</el-button>
-              <el-button type="primary" link @click="handleViewBalance(row)">
-                余额详情
-              </el-button>
-              <el-button type="primary" link @click="handleEditCustomer(row)">
-                编辑
-              </el-button>
-              <el-popconfirm 
-                title="确认删除该客户？" 
-                @confirm="handleDeleteCustomer(row)"
-              >
-                <template #reference>
-                  <el-button link type="danger" :icon="Delete">删除</el-button>
-                </template>
-              </el-popconfirm>
-            </el-space>
-          </template>
-        </el-table-column>
+        <el-table-column prop="registerTime" label="注册时间" min-width="180" sortable />
+
       </el-table>
 
       <!-- 分页器 -->

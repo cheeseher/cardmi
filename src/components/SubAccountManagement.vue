@@ -37,14 +37,7 @@
     <!-- 表格区域 -->
     <el-card>
       <!-- 工具栏 -->
-      <div class="table-toolbar">
-        <div class="left">
-          <el-button type="primary" :icon="Plus" @click="handleAdd">新增账户</el-button>
-        </div>
-        <div class="right">
-          <!-- 右侧可以放置搜索框或其他工具按钮 -->
-        </div>
-      </div>
+      <!-- 工具栏已移除 -->
 
       <el-table
         :data="tableData"
@@ -53,32 +46,17 @@
         v-loading="tableLoading"
         style="width: 100%"
       >
-      <el-table-column prop="accountId" label="账户ID" width="120" />
-      <el-table-column prop="username" label="用户名" width="150" />
-      <el-table-column prop="status" label="状态" width="120">
+      <el-table-column prop="accountId" label="账户ID" min-width="120" />
+      <el-table-column prop="username" label="用户名" min-width="150" />
+      <el-table-column prop="status" label="状态" min-width="120">
         <template #default="{ row }">
           <el-tag :type="row.status === 'enabled' ? 'success' : 'danger'">
             {{ row.status === 'enabled' ? '已启用' : '已禁用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="180" />
-      <el-table-column label="操作" width="150" fixed="right">
-        <template #default="{ row }">
-          <el-space>
-            <el-button link type="primary" :icon="Edit" @click="handleEdit(row)" class="action-btn">
-              <span>编辑</span>
-            </el-button>
-            <el-popconfirm title="确认删除该账户？" @confirm="handleDelete(row)">
-              <template #reference>
-                <el-button link type="danger" :icon="Delete" class="action-btn">
-                  <span>删除</span>
-                </el-button>
-              </template>
-            </el-popconfirm>
-          </el-space>
-        </template>
-      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" min-width="180" />
+      <!-- 操作列已移除 -->
       </el-table>
       
       <!-- 分页器 -->

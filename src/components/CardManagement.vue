@@ -48,31 +48,31 @@
         v-loading="tableLoading"
         style="width: 100%"
       >
-      <el-table-column prop="cardId" label="卡包ID" width="100" />
-      <el-table-column prop="cardName" label="卡包昵称" width="120" />
-      <el-table-column prop="customerId" label="客户ID" width="100" />
-      <el-table-column prop="productName" label="商品名称" width="120" />
-      <el-table-column prop="faceValue" label="面值" width="80">
+      <el-table-column prop="cardId" label="卡包ID" min-width="100" />
+      <el-table-column prop="cardName" label="卡包昵称" min-width="120" />
+      <el-table-column prop="customerId" label="客户ID" min-width="100" />
+      <el-table-column prop="productName" label="商品名称" min-width="120" />
+      <el-table-column prop="faceValue" label="面值" min-width="80">
         <template #default="{ row }">
           <span style="color: var(--el-color-primary); font-weight: 500;">{{ row.faceValue }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="discount" label="折扣" width="80">
+      <el-table-column prop="discount" label="折扣" min-width="80">
         <template #default="{ row }">
           <span style="color: var(--el-color-success); font-weight: 500;">{{ row.discount }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="productLink" label="商品链接" min-width="120">
+      <el-table-column prop="productLink" label="商品链接" min-width="150" show-overflow-tooltip>
         <template #default="{ row }">
-          <span style="color: var(--el-text-color-regular); word-break: break-all;">{{ row.productLink }}</span>
+          <span style="color: var(--el-text-color-regular);">{{ row.productLink }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="soldCount" label="已售出/总数" width="120">
+      <el-table-column prop="soldCount" label="已售出/总数" min-width="120">
         <template #default="{ row }">
           <span style="font-weight: 500;">{{ row.soldCount }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="createTime" label="创建时间" min-width="180" />
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
           <el-space>

@@ -44,12 +44,12 @@
         v-loading="tableLoading"
         style="width: 100%"
       >
-        <el-table-column prop="accountId" label="账户ID" width="120" />
-        <el-table-column prop="username" label="用户名" width="150" />
-        <el-table-column prop="operationType" label="操作类型" width="150" />
-        <el-table-column prop="operationTime" label="操作时间" width="180" />
-        <el-table-column prop="ipAddress" label="IP地址" width="140" />
-        <el-table-column prop="description" label="操作描述" min-width="200" />
+        <el-table-column prop="accountId" label="账户ID" min-width="120" />
+        <el-table-column prop="username" label="用户名" min-width="150" />
+        <el-table-column prop="operationType" label="操作类型" min-width="150" />
+        <el-table-column prop="operationTime" label="操作时间" min-width="180" />
+        <el-table-column prop="ipAddress" label="IP地址" min-width="140" />
+        <el-table-column prop="description" label="操作描述" min-width="200" show-overflow-tooltip />
       </el-table>
       
       <!-- 分页器 -->

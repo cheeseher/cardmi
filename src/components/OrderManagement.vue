@@ -84,14 +84,7 @@
             <el-icon><Plus /></el-icon>
             新增订单
           </el-button>
-          <el-button type="danger" @click="handleBatchDelete" :disabled="!selectedRows.length">
-            <el-icon><Delete /></el-icon>
-            批量删除
-          </el-button>
-          <el-button @click="handleExport">
-            <el-icon><Download /></el-icon>
-            导出数据
-          </el-button>
+
         </el-space>
         <el-tooltip content="刷新数据">
           <el-button circle @click="handleRefresh" :loading="tableLoading">
@@ -110,9 +103,9 @@
         style="width: 100%"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="orderId" label="订单ID" width="100" show-overflow-tooltip />
-        <el-table-column prop="orderNumber" label="订单编号" width="180" show-overflow-tooltip />
-        <el-table-column prop="customerInfo" label="客户信息" width="150">
+        <el-table-column prop="orderId" label="订单ID" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="orderNumber" label="订单编号" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="customerInfo" label="客户信息" min-width="150">
           <template #default="{ row }">
             <div>
               <div>ID: {{ row.customerId }}</div>
@@ -120,13 +113,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="productName" label="商品名称" width="120" show-overflow-tooltip />
-        <el-table-column prop="orderAmount" label="订单金额" width="100" sortable>
+        <el-table-column prop="productName" label="商品名称" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="orderAmount" label="订单金额" min-width="100" sortable>
           <template #default="{ row }">
             <span style="color: var(--el-color-primary); font-weight: var(--el-font-weight-primary)">¥{{ parseFloat(row.orderAmount).toLocaleString() }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="orderStatus" label="订单状态" width="100">
+        <el-table-column prop="orderStatus" label="订单状态" min-width="100">
           <template #default="{ row }">
             <el-tag
               :type="getStatusType(row.orderStatus)"
@@ -135,8 +128,8 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="cardPackage" label="卡包信息" width="120" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="下单时间" width="180" sortable />
+        <el-table-column prop="cardPackage" label="卡包信息" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="createTime" label="下单时间" min-width="180" sortable />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-space>
