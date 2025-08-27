@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:admin": "vite build --outDir dist/admin",
+    "build:merchant": "vite build --outDir dist/merchant"
   },
   "dependencies": {
     "vue": "^3.3.4",
