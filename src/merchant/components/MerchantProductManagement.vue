@@ -39,6 +39,14 @@
             <span class="value ip-list">{{ merchantInfo.ipWhitelist }}</span>
           </div>
         </div>
+        
+        <div class="info-row">
+          <div class="info-item">
+            <span class="label">商户余额</span>
+            <span class="value balance-amount">¥{{ merchantInfo.balance || '0.00' }}</span>
+            <el-button type="primary" size="small" @click="showBalanceDetailDialog = true">余额详情</el-button>
+          </div>
+        </div>
       </div>
       
 
@@ -84,6 +92,91 @@
         </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- 余额详情弹窗 -->
+    <el-dialog
+      v-model="showBalanceDetailDialog"
+      title="余额详情"
+      width="1000px"
+      :before-close="handleCloseBalanceDialog"
+    >
+      <!-- 筛选区域 -->
+      <el-card shadow="never" class="filter-container">
+        <el-form :model="balanceFilterForm" inline>
+          <el-form-item label="流水类型：">
+            <el-select
+              v-model="balanceFilterForm.flowType"
+              placeholder="请选择流水类型"
+              clearable
+              style="width: 168px"
+            >
+              <el-option label="全部" value="" />
+              <el-option label="余额调整" value="余额调整" />
+              <el-option label="交易增减" value="交易增减" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleBalanceFilter">查询</el-button>
+            <el-button @click="resetBalanceFilter">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
+
+      <!-- 余额详情表格 -->
+      <el-table
+        :data="filteredBalanceDetailData"
+        border
+        stripe
+        style="margin-top: 16px"
+      >
+        <el-table-column prop="flowType" label="流水类型" width="120" />
+        <el-table-column prop="beforeAmount" label="交易前金额" width="120">
+          <template #default="{ row }">
+            ¥{{ row.beforeAmount }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="amount" label="变动金额" width="120">
+          <template #default="{ row }">
+            <span :class="{ 'positive-amount': row.amount > 0, 'negative-amount': row.amount < 0 }">
+              {{ row.amount > 0 ? '+' : '' }}¥{{ row.amount }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="afterAmount" label="变动后金额" width="120">
+          <template #default="{ row }">
+            ¥{{ row.afterAmount }}
+          </template>
+        </el-table-column>
+        <el-table-column label="备注" min-width="200">
+          <template #default="{ row }">
+            <span v-if="row.flowType === '交易增减'">
+              {{ row.amount > 0 ? `锁卡返还余额，单号：${row.type}` : `提卡单号：${row.type}` }}
+            </span>
+            <span v-else>{{ row.type }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="editTime" label="修改时间" width="180" />
+      </el-table>
+
+      <!-- 分页器 -->
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="balancePagination.currentPage"
+          v-model:page-size="balancePagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next"
+          :total="balancePagination.total"
+          @size-change="handleBalanceSizeChange"
+          @current-change="handleBalanceCurrentChange"
+        />
+      </div>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showBalanceDetailDialog = false">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
     <!-- IP白名单设置弹窗 -->
     <el-dialog
@@ -147,7 +240,8 @@ const merchantInfo = computed(() => {
       merchantNo: props.merchantInfo.merchantNo,
       signPassword: props.merchantInfo.signKey || 'YOUR_SIGN_KEY_HERE',
       aesPassword: props.merchantInfo.merchantKey || 'YOUR_AES_KEY_HERE',
-      ipWhitelist: '39.98.76.22,39.98.76.22'
+      ipWhitelist: '39.98.76.22,39.98.76.22',
+      balance: '15680.50'
     }
   }
   return {
@@ -155,7 +249,8 @@ const merchantInfo = computed(() => {
     merchantNo: 'M17408123456',
     signPassword: 'YOUR_SIGN_KEY_HERE',
     aesPassword: 'YOUR_AES_KEY_HERE',
-    ipWhitelist: '39.98.76.22,39.98.76.22'
+    ipWhitelist: '39.98.76.22,39.98.76.22',
+    balance: '15680.50'
   }
 })
 
@@ -239,6 +334,77 @@ const ipWhitelistForm = reactive({
 })
 const ipWhitelistFormRef = ref()
 
+// 余额详情相关
+const showBalanceDetailDialog = ref(false)
+const balanceFilterForm = ref({
+  flowType: ''
+})
+const balancePagination = ref({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0
+})
+
+// 模拟余额详情数据
+const balanceDetailData = ref([
+  {
+    id: 1,
+    flowType: '余额调整',
+    beforeAmount: '10000.00',
+    amount: 5000.00,
+    afterAmount: '15000.00',
+    operator: '管理员',
+    type: '手动调整',
+    editTime: '2024-01-15 10:30:00'
+  },
+  {
+    id: 2,
+    flowType: '交易增减',
+    beforeAmount: '15000.00',
+    amount: 680.50,
+    afterAmount: '15680.50',
+    operator: '系统',
+    type: 'ORD20240115001',
+    editTime: '2024-01-15 14:20:00'
+  },
+  {
+    id: 3,
+    flowType: '交易增减',
+    beforeAmount: '15680.50',
+    amount: -200.00,
+    afterAmount: '15480.50',
+    operator: '系统',
+    type: 'ORD20240115002',
+    editTime: '2024-01-15 16:45:00'
+  },
+  {
+    id: 4,
+    flowType: '余额调整',
+    beforeAmount: '15480.50',
+    amount: 200.00,
+    afterAmount: '15680.50',
+    operator: '管理员',
+    type: '补偿调整',
+    editTime: '2024-01-15 17:10:00'
+  }
+])
+
+// 筛选后的余额详情数据
+const filteredBalanceDetailData = computed(() => {
+  let filtered = balanceDetailData.value
+  
+  if (balanceFilterForm.value.flowType) {
+    filtered = filtered.filter(item => item.flowType === balanceFilterForm.value.flowType)
+  }
+  
+  balancePagination.value.total = filtered.length
+  
+  const start = (balancePagination.value.currentPage - 1) * balancePagination.value.pageSize
+  const end = start + balancePagination.value.pageSize
+  
+  return filtered.slice(start, end)
+})
+
 // 设置IP白名单
 const handleSettings = () => {
   // 初始化表单数据
@@ -273,6 +439,29 @@ const handleCancelIpWhitelist = () => {
   ipWhitelistDialogVisible.value = false
   // 重置表单
   ipWhitelistForm.ipList = ''
+}
+
+// 余额详情相关方法
+const handleCloseBalanceDialog = () => {
+  showBalanceDetailDialog.value = false
+}
+
+const handleBalanceFilter = () => {
+  balancePagination.value.currentPage = 1
+}
+
+const resetBalanceFilter = () => {
+  balanceFilterForm.value.flowType = ''
+  balancePagination.value.currentPage = 1
+}
+
+const handleBalanceSizeChange = (size) => {
+  balancePagination.value.pageSize = size
+  balancePagination.value.currentPage = 1
+}
+
+const handleBalanceCurrentChange = (page) => {
+  balancePagination.value.currentPage = page
 }
 
 // IP白名单表单验证规则
@@ -520,5 +709,31 @@ onMounted(() => {
 .el-dialog .el-textarea__inner {
   resize: vertical;
   min-height: 120px;
+}
+
+/* 余额相关样式 */
+.balance-amount {
+  font-weight: bold;
+  color: #409eff;
+  font-size: 16px;
+  margin-right: 12px;
+}
+
+.filter-container {
+  margin-bottom: 16px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.positive-amount {
+  color: #67c23a;
+}
+
+.negative-amount {
+  color: #f56c6c;
 }
 </style>

@@ -390,7 +390,7 @@
             >
               <el-option label="全部" value="" />
               <el-option label="人工修改" value="人工修改" />
-                <el-option label="交易扣减" value="交易扣减" />
+                <el-option label="交易增减" value="交易增减" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -423,12 +423,12 @@
         </el-table-column>
         <el-table-column prop="operator" label="操作人" width="120">
           <template #default="{ row }">
-            <span>{{ row.flowType === '交易扣减' ? '' : row.operator }}</span>
+            <span>{{ row.flowType === '交易增减' ? '' : row.operator }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="type" label="备注" min-width="200">
           <template #default="{ row }">
-            <span>{{ row.flowType === '人工修改' ? '' : (row.flowType === '交易扣减' ? '提卡单号' : row.type) }}</span>
+            <span>{{ row.flowType === '人工修改' ? '' : (row.flowType === '交易增减' ? (row.amount > 0 ? `锁卡返还余额，单号：${row.type}` : `提卡单号：${row.type}`) : row.type) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="editTime" label="修改时间" width="180" />
@@ -546,6 +546,15 @@
                   size="small"
                   style="width: 120px"
                   @change="handleDiscountChange(row)"
+                />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="启用状态" width="100" align="center">
+              <template #default="{ row }">
+                <el-switch
+                  v-model="row.enabled"
+                  @change="handleEnabledChange(row)"
                 />
               </template>
             </el-table-column>
@@ -757,7 +766,7 @@ const balanceDetailData = ref([
     amount: -0.1,
     beforeAmount: 10.0,
     afterAmount: 9.9,
-    flowType: '交易扣减',
+    flowType: '交易增减',
     type: 'TK202502251432001'
   },
   {
@@ -784,8 +793,17 @@ const balanceDetailData = ref([
     amount: -25,
     beforeAmount: 50.0,
     afterAmount: 25.0,
-    flowType: '交易扣减',
+    flowType: '交易增减',
     type: 'TK202502241020002'
+  },
+  {
+    operator: '',
+    editTime: '2025-02-23 15:30:45',
+    amount: 15,
+    beforeAmount: 35.0,
+    afterAmount: 50.0,
+    flowType: '交易增减',
+    type: 'SK202502231530001'
   }
 ])
 
@@ -1183,6 +1201,12 @@ const handleDiscountChange = (row) => {
   console.log('折扣变化:', row.productCode, row.discountRate)
 }
 
+// 处理启用状态变化
+const handleEnabledChange = (row) => {
+  console.log('启用状态变化:', row.productCode, row.enabled)
+  ElMessage.success(`${row.productName} ${row.enabled ? '已启用' : '已禁用'}`)
+}
+
 // 处理面值变化
 // 新增产品配置 - 打开产品选择模态窗口
 const handleAddProduct = async () => {
@@ -1293,7 +1317,8 @@ const confirmProductSelection = () => {
           productCode: product.productId,
           productName: product.productName,
           faceValue: faceValue, // 从级联选择中获取面值
-          discountRate: '' // 默认为空，支持不同折扣配置
+          discountRate: '', // 默认为空，支持不同折扣配置
+          enabled: true // 默认启用状态
         }
         productConfigData.value.push(newProductConfig)
       }
