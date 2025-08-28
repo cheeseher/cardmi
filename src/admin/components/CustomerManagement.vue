@@ -812,7 +812,6 @@ const handleSelectionChange = (selection) => {
 }
 
 // 商户后台入口处理函数
-// 商户后台入口处理函数
 const handleMerchantBackend = (row) => {
   // 使用路由导航到商户后台，传递商户信息参数
   const merchantParams = new URLSearchParams({
@@ -822,8 +821,8 @@ const handleMerchantBackend = (row) => {
     customerId: row.customerId
   })
   
-  // 使用路由跳转到商户后台
-  window.location.href = `/merchant?${merchantParams.toString()}`
+  // 在新标签页中打开商户后台
+  window.open(`/merchant?${merchantParams.toString()}`, '_blank')
   
   ElMessage.success(`正在进入 ${row.customerName} 的商户后台系统`)
 }
