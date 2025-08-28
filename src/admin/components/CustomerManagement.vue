@@ -525,23 +525,14 @@
             v-loading="productConfigLoading"
           >
             <el-table-column prop="productCode" label="产品编码" width="120" />
-            <el-table-column prop="productName" label="产品名称" min-width="150" />
+            <el-table-column label="产品名称" min-width="150">
+              <template #default="{ row }">
+                <span>{{ row.productName }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="面值" width="160" align="center">
               <template #default="{ row }">
-                <el-select
-                  v-model="row.faceValue"
-                  placeholder="选择面值"
-                  size="small"
-                  style="width: 100px"
-                  @change="handleFaceValueChange(row)"
-                >
-                  <el-option
-                    v-for="value in faceValueOptions"
-                    :key="value"
-                    :label="`¥${value}`"
-                    :value="value"
-                  />
-                </el-select>
+                <span>¥{{ row.faceValue }}</span>
               </template>
             </el-table-column>
             <el-table-column label="折扣比例" width="180" align="center">
@@ -589,29 +580,39 @@
     <!-- 产品选择对话框 -->
     <el-dialog
       v-model="productSelectVisible"
-      title="选择产品"
-      width="500px"
+      title="选择产品配置"
+      width="600px"
       :before-close="handleProductSelectClose"
     >
       <div class="product-select-content">
-        <el-form label-width="80px">
-          <el-form-item label="选择产品：">
-            <el-select
-              v-model="selectedProductIds"
+        <el-form label-width="100px">
+          <el-form-item label="产品配置：">
+            <el-cascader
+              v-model="selectedProductConfigs"
+              :options="cascaderOptions"
+              :props="cascaderProps"
               multiple
               filterable
-              placeholder="请选择产品"
+              placeholder="请选择产品和面值"
               style="width: 100%"
               :loading="productListLoading"
-            >
-              <el-option
-                v-for="product in availableProducts"
-                :key="product.productId"
-                :label="product.productName"
-                :value="product.productId"
-              />
-            </el-select>
+              clearable
+            />
           </el-form-item>
+          <div class="selection-summary" v-if="selectedProductConfigs.length > 0">
+            <div class="summary-title">已选择的配置：</div>
+            <div class="selected-items">
+              <el-tag
+                v-for="(config, index) in getSelectedConfigsDisplay()"
+                :key="index"
+                type="info"
+                size="small"
+                style="margin: 2px 4px 2px 0;"
+              >
+                {{ config }}
+              </el-tag>
+            </div>
+          </div>
         </el-form>
       </div>
 
@@ -621,9 +622,9 @@
           <el-button 
             type="primary" 
             @click="confirmProductSelection"
-            :disabled="selectedProductIds.length === 0"
+            :disabled="selectedProductConfigs.length === 0"
           >
-            确认选择 ({{ selectedProductIds.length }})
+            确认选择 ({{ selectedProductConfigs.length }})
           </el-button>
         </div>
       </template>
@@ -840,9 +841,20 @@ const productConfigData = ref([])
 
 // 产品选择模态窗口相关
 const productSelectVisible = ref(false)
-const selectedProductIds = ref([])
+const selectedProductIds = ref([]) // 保留兼容性
+const selectedProductConfigs = ref([]) // 新的级联选择数据
 const availableProducts = ref([])
 const productListLoading = ref(false)
+
+// 级联选择器配置
+const cascaderOptions = ref([])
+const cascaderProps = {
+  multiple: true,
+  checkStrictly: false,
+  value: 'value',
+  label: 'label',
+  children: 'children'
+}
 
 
 
@@ -1172,10 +1184,6 @@ const handleDiscountChange = (row) => {
 }
 
 // 处理面值变化
-const handleFaceValueChange = (row) => {
-  console.log('面值变化:', row.productCode, row.faceValue)
-}
-
 // 新增产品配置 - 打开产品选择模态窗口
 const handleAddProduct = async () => {
   productSelectVisible.value = true
@@ -1202,6 +1210,20 @@ const initAvailableProducts = async () => {
     ]
     
     availableProducts.value = mockProducts
+    
+    // 生成级联选择器数据结构
+    const faceValueOptions = [10, 20, 50, 100, 200, 300]
+    cascaderOptions.value = mockProducts.map(product => ({
+      value: product.productId,
+      label: product.productName,
+      children: faceValueOptions.map(faceValue => ({
+        value: `${product.productId}-${faceValue}`,
+        label: `${faceValue}元`,
+        productId: product.productId,
+        productName: product.productName,
+        faceValue: faceValue
+      }))
+    }))
   } catch (error) {
     ElMessage.error('获取产品数据失败')
   } finally {
@@ -1234,35 +1256,56 @@ const handleProductConfigClose = () => {
 const handleProductSelectClose = () => {
   productSelectVisible.value = false
   selectedProductIds.value = []
+  selectedProductConfigs.value = []
+}
+
+// 获取已选择配置的显示文本
+const getSelectedConfigsDisplay = () => {
+  return selectedProductConfigs.value.map(configPath => {
+    // configPath 是一个数组，如 ['PD1001', 'PD1001-10']
+    if (configPath.length === 2) {
+      const [productId, configId] = configPath
+      const product = availableProducts.value.find(p => p.productId === productId)
+      const faceValue = configId.split('-')[1]
+      return `${product?.productName || productId} - ${faceValue}元`
+    }
+    return configPath.join(' - ')
+  })
 }
 
 // 确认产品选择
 const confirmProductSelection = () => {
-  if (selectedProductIds.value.length === 0) {
-    ElMessage.warning('请至少选择一个产品')
+  if (selectedProductConfigs.value.length === 0) {
+    ElMessage.warning('请选择至少一个产品配置')
     return
   }
   
-  // 将选择的产品添加到产品配置数据中
-  selectedProductIds.value.forEach(productId => {
-    const product = availableProducts.value.find(p => p.productId === productId)
-    if (product) {
-      const newProductConfig = {
-        id: Date.now() + Math.random(), // 使用时间戳+随机数作为临时ID
-        productCode: product.productId,
-        productName: product.productName,
-        faceValue: '', // 默认为空
-        discountRate: '' // 默认为空
+  // 为每个选中的产品-面值组合添加配置项
+  selectedProductConfigs.value.forEach(configPath => {
+    if (configPath.length === 2) {
+      const [productId, configId] = configPath
+      const product = availableProducts.value.find(p => p.productId === productId)
+      const faceValue = configId.split('-')[1]
+      
+      if (product) {
+        const newProductConfig = {
+          id: Date.now() + Math.random(), // 使用时间戳+随机数作为唯一ID
+          productCode: product.productId,
+          productName: product.productName,
+          faceValue: faceValue, // 从级联选择中获取面值
+          discountRate: '' // 默认为空，支持不同折扣配置
+        }
+        productConfigData.value.push(newProductConfig)
       }
-      productConfigData.value.push(newProductConfig)
     }
   })
   
-  ElMessage.success(`成功添加 ${selectedProductIds.value.length} 个产品配置`)
+  ElMessage.success(`已添加 ${selectedProductConfigs.value.length} 个产品配置，请设置折扣比例`)
   
   // 关闭模态窗口
   productSelectVisible.value = false
   selectedProductIds.value = []
+  selectedProductConfigs.value = []
 }
 
 // 保存产品配置
