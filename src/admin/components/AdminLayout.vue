@@ -39,16 +39,17 @@
           </el-menu-item>
           <el-menu-item index="card-management">
             <el-icon><Shop /></el-icon>
-            <span>卡密产品管理</span>
+            <span>产品管理</span>
           </el-menu-item>
           <el-menu-item index="order-management">
             <el-icon><Document /></el-icon>
-            <span>订单管理</span>
+            <span>提卡订单</span>
           </el-menu-item>
-          <el-menu-item index="card-query">
-            <el-icon><Search /></el-icon>
-            <span>卡密查询</span>
+          <el-menu-item index="verification-order-management">
+            <el-icon><Document /></el-icon>
+            <span>核销订单</span>
           </el-menu-item>
+
           <el-sub-menu index="system-settings">
             <template #title>
               <el-icon><Setting /></el-icon>
@@ -99,7 +100,8 @@ import Dashboard from './Dashboard.vue'
 import CustomerManagement from './CustomerManagement.vue'
 import CardManagement from './CardManagement.vue'
 import OrderManagement from './OrderManagement.vue'
-import CardQuery from './CardQuery.vue'
+import VerificationOrderManagement from './VerificationOrderManagement.vue'
+
 import SubAccountManagement from './SubAccountManagement.vue'
 import OperationLog from './OperationLog.vue'
 import ResetPassword from './ResetPassword.vue'
@@ -114,7 +116,8 @@ const components = {
   'customer-management': CustomerManagement,
   'card-management': CardManagement,
   'order-management': OrderManagement,
-  'card-query': CardQuery,
+  'verification-order-management': VerificationOrderManagement,
+
   'subaccount-management': SubAccountManagement,
   'operation-log': OperationLog,
   'reset-password': ResetPassword

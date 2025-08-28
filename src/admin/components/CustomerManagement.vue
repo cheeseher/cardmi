@@ -118,8 +118,24 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="customerName" label="客户昵称" width="140" show-overflow-tooltip />
-        <el-table-column prop="customerEmail" label="客户邮箱" width="200" show-overflow-tooltip />
+        <el-table-column prop="aesKey" label="AES密钥" width="240" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: monospace; font-size: 12px;">{{ row.aesKey }}</span>
+              <el-button type="primary" link size="small" @click="copyAesKey(row.aesKey)">
+                <el-icon><CopyDocument /></el-icon>
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="客户信息" width="220" show-overflow-tooltip>
+          <template #default="{ row }">
+            <div style="line-height: 1.4;">
+              <div style="font-weight: 500; color: var(--el-text-color-primary);">{{ row.customerName }}</div>
+              <div style="font-size: 12px; color: var(--el-text-color-regular); margin-top: 2px;">{{ row.customerEmail }}</div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="balance" label="余额" width="120" sortable align="right">
           <template #default="{ row }">
             <span style="color: var(--el-color-primary); font-weight: 500;">¥{{ parseFloat(row.balance).toLocaleString() }}</span>
@@ -214,24 +230,27 @@
             v-model="addForm.merchantNo"
             placeholder="系统自动生成"
             readonly
-            style="background-color: #ffffff;"
-          >
-            <template #append>
-              <el-button @click="generateMerchantNo" :icon="Refresh" />
-            </template>
-          </el-input>
+            disabled
+            style="background-color: var(--el-fill-color-light);"
+          />
         </el-form-item>
         <el-form-item label="商户密钥" prop="merchantKey">
           <el-input
             v-model="addForm.merchantKey"
             placeholder="系统自动生成"
             readonly
-            style="background-color: #ffffff;"
-          >
-            <template #append>
-              <el-button @click="generateMerchantKey" :icon="Refresh" />
-            </template>
-          </el-input>
+            disabled
+            style="background-color: var(--el-fill-color-light);"
+          />
+        </el-form-item>
+        <el-form-item label="AES密钥" prop="aesKey">
+          <el-input
+            v-model="addForm.aesKey"
+            placeholder="系统自动生成"
+            readonly
+            disabled
+            style="background-color: var(--el-fill-color-light);"
+          />
         </el-form-item>
         <el-form-item label="客户昵称" prop="customerName">
           <el-input
@@ -295,9 +314,18 @@
               style="background-color: var(--el-fill-color-light);"
             />
           </el-form-item>
-          <el-form-item label="密钥">
+          <el-form-item label="商户密钥">
             <el-input
               v-model="editForm.merchantKey"
+              disabled
+              style="background-color: var(--el-fill-color-light);"
+              type="password"
+              show-password
+            />
+          </el-form-item>
+          <el-form-item label="AES密钥">
+            <el-input
+              v-model="editForm.aesKey"
               disabled
               style="background-color: var(--el-fill-color-light);"
               type="password"
@@ -349,17 +377,61 @@
       title="余额详情"
       width="900px"
     >
-      <el-table :data="balanceDetailData" border stripe>
-        <el-table-column prop="operator" label="操作人" width="120" />
-        <el-table-column prop="editTime" label="编辑时间" width="180" />
-        <el-table-column prop="amount" label="数额" width="120">
+      <!-- 筛选区域 -->
+      <el-card shadow="never" class="balance-filter-container">
+        <el-form :model="balanceFilterForm" inline>
+          <el-form-item label="流水类型：" prop="flowType">
+            <el-select
+              v-model="balanceFilterForm.flowType"
+              placeholder="请选择流水类型"
+              clearable
+              style="width: 150px"
+              @change="handleBalanceFilter"
+            >
+              <el-option label="全部" value="" />
+              <el-option label="人工修改" value="人工修改" />
+                <el-option label="交易扣减" value="交易扣减" />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </el-card>
+      
+      <el-table :data="filteredBalanceDetailData" border stripe>
+        <el-table-column prop="flowType" label="流水类型" width="120">
+          <template #default="{ row }">
+            <el-tag :type="row.flowType === '人工修改' ? 'primary' : 'warning'">
+              {{ row.flowType }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="beforeAmount" label="交易前金额" width="120">
+          <template #default="{ row }">
+            <span class="amount-text">{{ row.beforeAmount }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="amount" label="变动金额" width="120">
           <template #default="{ row }">
             <span :class="row.amount > 0 ? 'amount-positive' : 'amount-negative'">
               {{ row.amount > 0 ? '+' : '' }}{{ row.amount }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" min-width="200" />
+        <el-table-column prop="afterAmount" label="变动后金额" width="120">
+          <template #default="{ row }">
+            <span class="amount-text">{{ row.afterAmount }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="operator" label="操作人" width="120">
+          <template #default="{ row }">
+            <span>{{ row.flowType === '交易扣减' ? '' : row.operator }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="type" label="备注" min-width="200">
+          <template #default="{ row }">
+            <span>{{ row.flowType === '人工修改' ? '' : (row.flowType === '交易扣减' ? '提卡单号' : row.type) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="editTime" label="修改时间" width="180" />
       </el-table>
       <div class="pagination-wrapper">
         <el-pagination
@@ -450,38 +522,44 @@
             :data="productConfigData"
             border
             stripe
-            style="width: 100%"
             v-loading="productConfigLoading"
           >
             <el-table-column prop="productCode" label="产品编码" width="120" />
             <el-table-column prop="productName" label="产品名称" min-width="150" />
-            <el-table-column prop="faceValue" label="面值" width="100" align="right">
+            <el-table-column label="面值" width="160" align="center">
               <template #default="{ row }">
-                <span>¥{{ parseFloat(row.faceValue).toLocaleString() }}</span>
+                <el-select
+                  v-model="row.faceValue"
+                  placeholder="选择面值"
+                  size="small"
+                  style="width: 100px"
+                  @change="handleFaceValueChange(row)"
+                >
+                  <el-option
+                    v-for="value in faceValueOptions"
+                    :key="value"
+                    :label="`¥${value}`"
+                    :value="value"
+                  />
+                </el-select>
               </template>
             </el-table-column>
-            <el-table-column label="折扣比例" width="150" align="center">
+            <el-table-column label="折扣比例" width="180" align="center">
               <template #default="{ row }">
                 <el-input-number
                   v-model="row.discountRate"
                   :min="0"
-                  :max="1"
                   :step="0.01"
                   :precision="2"
+                  placeholder="请输入"
                   size="small"
                   style="width: 120px"
                   @change="handleDiscountChange(row)"
                 />
               </template>
             </el-table-column>
-            <el-table-column label="扣款价格" width="120" align="right">
-              <template #default="{ row }">
-                <span style="color: var(--el-color-primary); font-weight: 500;">
-                  ¥{{ (parseFloat(row.faceValue) * row.discountRate).toFixed(2) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="80" align="center">
+
+            <el-table-column label="操作" width="100" align="center">
               <template #default="{ row, $index }">
                 <el-button
                   type="danger"
@@ -529,7 +607,7 @@
               <el-option
                 v-for="product in availableProducts"
                 :key="product.productId"
-                :label="`${product.productName} - ¥${product.faceValue}`"
+                :label="product.productName"
                 :value="product.productId"
               />
             </el-select>
@@ -592,6 +670,7 @@ const tableData = ref([
     customerId: '1001',
     merchantNo: 'M17408123456',
     merchantKey: 'test_key_1234567890abcdef1234567890abcdef',
+    aesKey: 'aes_key_1234567890abcdef1234567890abcdef',
     customerName: 'asd',
     customerEmail: '123@qq.com',
     balance: '9.900',
@@ -602,6 +681,7 @@ const tableData = ref([
     customerId: '1002',
     merchantNo: 'M17408234567',
     merchantKey: 'test_key_abcdef1234567890abcdef1234567890',
+    aesKey: 'aes_key_fedcba0987654321fedcba0987654321',
     customerName: 'aaa',
     customerEmail: '888@gmail.com',
     balance: '0.000',
@@ -612,6 +692,7 @@ const tableData = ref([
     customerId: '1003',
     merchantNo: 'M17408345678',
     merchantKey: 'test_key_9876543210fedcba9876543210fedcba',
+    aesKey: 'aes_key_abcd1234efgh5678ijkl9012mnop3456',
     customerName: 'bbb',
     customerEmail: '999@gmail.com',
     balance: '0.000',
@@ -633,6 +714,7 @@ const addFormRef = ref()
 const addForm = reactive({
   merchantNo: '',
   merchantKey: '',
+  aesKey: '',
   customerName: '',
   customerEmail: '',
   balance: ''
@@ -656,6 +738,7 @@ const editForm = reactive({
   balance: '',
   merchantNo: '',
   merchantKey: '',
+  aesKey: '',
   status: 'active'
 })
 
@@ -671,15 +754,57 @@ const balanceDetailData = ref([
     operator: 'admin',
     editTime: '2025-02-25 14:32:33',
     amount: -0.1,
-    type: '余额增加或余额扣减'
+    beforeAmount: 10.0,
+    afterAmount: 9.9,
+    flowType: '交易扣减',
+    type: 'TK202502251432001'
   },
   {
     operator: 'manager',
     editTime: '2025-02-25 00:28:27',
     amount: 10,
-    type: '新增客户：初始余额'
+    beforeAmount: 0.0,
+    afterAmount: 10.0,
+    flowType: '人工修改',
+    type: ''
+  },
+  {
+    operator: 'admin',
+    editTime: '2025-02-24 16:45:12',
+    amount: 50,
+    beforeAmount: 25.0,
+    afterAmount: 75.0,
+    flowType: '人工修改',
+    type: ''
+  },
+  {
+    operator: '',
+    editTime: '2025-02-24 10:20:15',
+    amount: -25,
+    beforeAmount: 50.0,
+    afterAmount: 25.0,
+    flowType: '交易扣减',
+    type: 'TK202502241020002'
   }
 ])
+
+// 余额详情筛选表单
+const balanceFilterForm = ref({
+  flowType: ''
+})
+
+// 筛选后的余额详情数据
+const filteredBalanceDetailData = computed(() => {
+  if (!balanceFilterForm.value.flowType) {
+    return balanceDetailData.value
+  }
+  return balanceDetailData.value.filter(item => item.flowType === balanceFilterForm.value.flowType)
+})
+
+// 处理余额筛选
+const handleBalanceFilter = () => {
+  // 筛选逻辑已通过computed实现
+}
 
 const balancePagination = reactive({
   currentPage: 1,
@@ -708,29 +833,10 @@ const productConfigVisible = ref(false)
 const productConfigLoading = ref(false)
 const saveLoading = ref(false)
 const currentCustomer = ref({})
-const productConfigData = ref([
-  {
-    id: 1,
-    productCode: 'CARD001',
-    productName: '产品A-[100]',
-    faceValue: '100.00',
-    discountRate: 0.95
-  },
-  {
-    id: 2,
-    productCode: 'CARD002', 
-    productName: '产品B-[50]',
-    faceValue: '50.00',
-    discountRate: 0.90
-  },
-  {
-    id: 3,
-    productCode: 'CARD003',
-    productName: '产品C-[200]',
-    faceValue: '200.00',
-    discountRate: 0.88
-  }
-])
+
+// 面值选项
+const faceValueOptions = ref([10, 20, 50, 100, 200, 300])
+const productConfigData = ref([])
 
 // 产品选择模态窗口相关
 const productSelectVisible = ref(false)
@@ -845,6 +951,28 @@ const generateMerchantKey = () => {
   addForm.merchantKey = result
 }
 
+// 生成AES密钥的函数
+const generateAesKey = () => {
+  const prefix = 'aes_key_'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = prefix
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  addForm.aesKey = result
+}
+
+// 为编辑表单生成AES密钥的函数
+const generateEditAesKey = () => {
+  const prefix = 'aes_key_'
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = prefix
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  editForm.aesKey = result
+}
+
 // 复制商户密钥到剪贴板
 const copyMerchantKey = async (key) => {
   try {
@@ -855,18 +983,30 @@ const copyMerchantKey = async (key) => {
   }
 }
 
+// 复制AES密钥到剪贴板
+const copyAesKey = async (key) => {
+  try {
+    await navigator.clipboard.writeText(key)
+    ElMessage.success('AES密钥已复制到剪贴板')
+  } catch (error) {
+    ElMessage.error('复制失败，请手动复制')
+  }
+}
+
 const handleAddCustomer = () => {
   addDialogVisible.value = true
   Object.assign(addForm, {
     merchantNo: '',
     merchantKey: '',
+    aesKey: '',
     customerName: '',
     customerEmail: '',
     balance: ''
   })
-  // 自动生成商户号和商户密钥
+  // 自动生成商户号、商户密钥和AES密钥
   generateMerchantNo()
   generateMerchantKey()
+  generateAesKey()
 }
 
 const handleAddConfirm = async () => {
@@ -889,6 +1029,7 @@ const handleEditCustomer = (row) => {
     balance: row.balance,
     merchantNo: row.merchantNo,
     merchantKey: row.merchantKey,
+    aesKey: row.aesKey,
     status: row.status || 'active'
   })
 }
@@ -915,7 +1056,7 @@ const handleEditConfirm = async () => {
 
 const handleResetKey = (row) => {
   ElMessageBox.confirm(
-    `确认重置客户 "${row.customerName}" 的密钥吗？重置后原密钥将失效。`,
+    `确认重置客户 "${row.customerName}" 的商户密钥和AES密钥吗？重置后原密钥将失效。`,
     '重置密钥确认',
     {
       confirmButtonText: '确认重置',
@@ -923,15 +1064,20 @@ const handleResetKey = (row) => {
       type: 'warning',
     }
   ).then(() => {
-    // 生成新密钥
-    const newKey = generateMerchantKey()
+    // 生成新的商户密钥和AES密钥
+    const newMerchantKey = 'merchant_key_' + Math.random().toString(36).substr(2, 32)
+    const newAesKey = 'aes_key_' + Math.random().toString(36).substr(2, 32)
     
-    // 这里应该调用重置密钥API
-    console.log('重置密钥:', { customerId: row.customerId, newKey })
+    // 更新表格数据
+    const index = tableData.value.findIndex(item => item.customerId === row.customerId)
+    if (index !== -1) {
+      tableData.value[index].merchantKey = newMerchantKey
+      tableData.value[index].aesKey = newAesKey
+    }
     
     // 显示新密钥
     ElMessageBox.alert(
-      `新密钥已生成，请妥善保管：\n${newKey}`,
+      `新密钥已生成，请妥善保管：\n商户密钥：${newMerchantKey}\nAES密钥：${newAesKey}`,
       '密钥重置成功',
       {
         confirmButtonText: '我已保存',
@@ -945,7 +1091,7 @@ const handleResetKey = (row) => {
       handleRefresh()
     })
     
-    ElMessage.success('密钥重置成功')
+    ElMessage.success('商户密钥和AES密钥重置成功')
   }).catch(() => {
     ElMessage.info('已取消重置')
   })
@@ -1025,6 +1171,11 @@ const handleDiscountChange = (row) => {
   console.log('折扣变化:', row.productCode, row.discountRate)
 }
 
+// 处理面值变化
+const handleFaceValueChange = (row) => {
+  console.log('面值变化:', row.productCode, row.faceValue)
+}
+
 // 新增产品配置 - 打开产品选择模态窗口
 const handleAddProduct = async () => {
   productSelectVisible.value = true
@@ -1043,11 +1194,11 @@ const initAvailableProducts = async () => {
     await new Promise(resolve => setTimeout(resolve, 500))
     
     const mockProducts = [
-      { productId: 'PD1001', productName: '产品A-[10]', faceValue: '10' },
-      { productId: 'PD1002', productName: '产品B-[20]', faceValue: '20' },
-      { productId: 'PD1003', productName: '产品C-[50]', faceValue: '50' },
-      { productId: 'PD1004', productName: '产品D-[20]', faceValue: '20' },
-      { productId: 'PD1005', productName: '产品E-[50]', faceValue: '50' }
+      { productId: 'PD1001', productName: '产品A', faceValue: '10' },
+      { productId: 'PD1002', productName: '产品B', faceValue: '20' },
+      { productId: 'PD1003', productName: '产品C', faceValue: '50' },
+      { productId: 'PD1004', productName: '产品D', faceValue: '20' },
+      { productId: 'PD1005', productName: '产品E', faceValue: '50' }
     ]
     
     availableProducts.value = mockProducts
@@ -1100,8 +1251,8 @@ const confirmProductSelection = () => {
         id: Date.now() + Math.random(), // 使用时间戳+随机数作为临时ID
         productCode: product.productId,
         productName: product.productName,
-        faceValue: product.faceValue,
-        discountRate: 1.00
+        faceValue: '', // 默认为空
+        discountRate: '' // 默认为空
       }
       productConfigData.value.push(newProductConfig)
     }
@@ -1116,6 +1267,19 @@ const confirmProductSelection = () => {
 
 // 保存产品配置
 const handleProductConfigSave = async () => {
+  // 验证面值和折扣比例是否为空
+  for (let i = 0; i < productConfigData.value.length; i++) {
+    const product = productConfigData.value[i]
+    if (!product.faceValue || product.faceValue === '') {
+      ElMessage.error(`${product.productName} 请选择面值`)
+      return
+    }
+    if (!product.discountRate || product.discountRate === '') {
+      ElMessage.error(`${product.productName} 请输入折扣比例`)
+      return
+    }
+  }
+  
   saveLoading.value = true
   try {
     // 模拟保存API调用
@@ -1292,6 +1456,18 @@ onMounted(() => {
   justify-content: flex-end;
 }
 
+.balance-filter-container {
+  margin-bottom: 16px;
+}
+
+.balance-filter-container .el-form {
+  margin-bottom: 0;
+}
+
+.balance-filter-container .el-form-item {
+  margin-bottom: 0;
+}
+
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
@@ -1385,6 +1561,11 @@ onMounted(() => {
 
 .amount-negative {
   color: #f56c6c;
+  font-weight: 500;
+}
+
+.amount-text {
+  color: var(--el-text-color-primary);
   font-weight: 500;
 }
 

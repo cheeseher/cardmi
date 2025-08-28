@@ -21,9 +21,12 @@
               clearable
               style="width: 168px"
             >
-              <el-option label="联通充值卡" value="联通充值卡" />
-              <el-option label="移动充值卡" value="移动充值卡" />
-              <el-option label="电信充值卡" value="电信充值卡" />
+              <el-option
+                v-for="item in productOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </el-form-item>
           
@@ -334,39 +337,16 @@ const unlockableCount = computed(() => {
   return selectedRows.value.filter(row => row.verificationStatus === 'locked').length
 })
 
-// 表格数据
-const tableData = ref([
-  {
-    id: 1,
-    orderNo: 'ORD20241201001',
-    systemId: 'SYS001',
-    productName: 'Steam充值卡',
-    cardNumber: '1234-5678-9012-3456',
-    cardPassword: 'ABC123DEF456',
-    transactionAmount: 100.00,
-    transactionQuantity: 1,
-    transactionStatus: 'success',
-    withdrawalTime: '2024-12-01 10:30:00',
-    verificationStatus: 'verified',
-    withdrawalTimestamp: 1733025000,
-    faceValue: 100
-  },
-  {
-    id: 2,
-    orderNo: 'ORD20241201002',
-    systemId: 'SYS002',
-    productName: 'Apple Store充值卡',
-    cardNumber: '9876-5432-1098-7654',
-    cardPassword: 'XYZ789GHI012',
-    transactionAmount: 50.00,
-    transactionQuantity: 1,
-    transactionStatus: 'processing',
-    withdrawalTime: '2024-12-01 11:15:00',
-    verificationStatus: 'unverified',
-    withdrawalTimestamp: 1733027700,
-    faceValue: 50
-  }
+// 产品选项数据
+const productOptions = ref([
+  { label: '产品A', value: '产品A' },
+  { label: '产品B', value: '产品B' },
+  { label: '产品C', value: '产品C' },
+  { label: '产品D', value: '产品D' }
 ])
+
+// 表格数据
+const tableData = ref([])
 
 // 更新分页总数
 pagination.total = tableData.value.length
@@ -649,7 +629,7 @@ const mockTableData = [
     id: 1,
     orderNo: 'ORD20241201001',
     systemId: 'SYS001',
-    productName: 'Steam充值卡',
+    productName: '产品A',
     cardNumber: '1234-5678-9012-3456',
     cardPassword: 'ABC123DEF456',
     transactionAmount: 100.00,
@@ -669,7 +649,7 @@ const mockTableData = [
     id: 2,
     orderNo: 'ORD20241201002',
     systemId: 'SYS002',
-    productName: 'Apple Store充值卡',
+    productName: '产品B',
     cardNumber: '9876-5432-1098-7654',
     cardPassword: 'XYZ789GHI012',
     transactionAmount: 50.00,
@@ -689,7 +669,7 @@ const mockTableData = [
     id: 3,
     orderNo: 'ORD20241201003',
     systemId: 'SYS003',
-    productName: 'Google Play充值卡',
+    productName: '产品C',
     cardNumber: '1111-2222-3333-4444',
     cardPassword: 'DEF456GHI789',
     transactionAmount: 30.00,
@@ -704,6 +684,26 @@ const mockTableData = [
     merchantId: 'M003',
     merchantCode: 'MC003',
     merchantName: '字节跳动'
+  },
+  {
+    id: 4,
+    orderNo: 'ORD20241201004',
+    systemId: 'SYS004',
+    productName: '产品D',
+    cardNumber: '5555-6666-7777-8888',
+    cardPassword: 'JKL012MNO345',
+    transactionAmount: 20.00,
+    transactionQuantity: 1,
+    transactionStatus: 'success',
+    withdrawalTime: '2024-12-01 13:30:00',
+    verificationStatus: 'unverified',
+    withdrawalTimestamp: 1733035800,
+    faceValue: 20,
+    merchantOrderNo: 'MERCH004',
+    systemOrderNo: 'SYS004',
+    merchantId: 'M004',
+    merchantCode: 'MC004',
+    merchantName: '美团科技'
   }
 ]
 

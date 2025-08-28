@@ -60,15 +60,11 @@
       <el-table-column prop="productId" label="产品编码" width="120" />
       <el-table-column prop="productName" label="产品名称" min-width="150">
         <template #default="{ row, $index }">
-          <span>产品{{ String.fromCharCode(65 + $index) }}-[{{ row.faceValue }}]</span>
+          <span>产品{{ String.fromCharCode(65 + $index) }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column prop="faceValue" label="面值" width="100" align="center">
-        <template #default="{ row }">
-          <span style="color: var(--el-color-primary); font-weight: 500;">{{ row.faceValue }}元</span>
-        </template>
-      </el-table-column>
+
 
 
       <el-table-column prop="createTime" label="创建时间" width="160" />
@@ -125,19 +121,7 @@
 
 
 
-        <!-- 商品面值 -->
-        <el-divider content-position="left">商品面值</el-divider>
-        <el-form-item label="商品面值" prop="faceValue">
-          <el-radio-group v-model="addForm.faceValue">
-            <el-radio value="10">10元</el-radio>
-            <el-radio value="20">20元</el-radio>
-            <el-radio value="30">30元</el-radio>
-            <el-radio value="50">50元</el-radio>
-            <el-radio value="100">100元</el-radio>
-            <el-radio value="200">200元</el-radio>
-            <el-radio value="300">300元</el-radio>
-          </el-radio-group>
-        </el-form-item>
+
 
       </el-form>
       <template #footer>
@@ -178,17 +162,7 @@
           />
         </el-form-item>
         
-        <el-form-item label="产品面值" prop="faceValue">
-          <el-radio-group v-model="editForm.faceValue">
-            <el-radio value="10">10元</el-radio>
-            <el-radio value="20">20元</el-radio>
-            <el-radio value="30">30元</el-radio>
-            <el-radio value="50">50元</el-radio>
-            <el-radio value="100">100元</el-radio>
-            <el-radio value="200">200元</el-radio>
-            <el-radio value="300">300元</el-radio>
-          </el-radio-group>
-        </el-form-item>
+
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -254,13 +228,11 @@ const pagination = reactive({
 const addDialogVisible = ref(false)
 const addFormRef = ref()
 const addForm = reactive({
-  productName: '',
-  faceValue: '10'
+  productName: ''
 })
 
 const addFormRules = {
-  productName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
-  faceValue: [{ required: true, message: '请选择商品面值', trigger: 'change' }]
+  productName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }]
 }
 
 // 编辑产品弹窗
@@ -268,13 +240,11 @@ const editDialogVisible = ref(false)
 const editFormRef = ref()
 const editForm = reactive({
   productId: '',
-  productName: '',
-  faceValue: '10'
+  productName: ''
 })
 
 const editFormRules = {
-  productName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
-  faceValue: [{ required: true, message: '请选择商品面值', trigger: 'change' }]
+  productName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }]
 }
 
 
@@ -295,8 +265,7 @@ const handleReset = () => {
 const handleAddProduct = () => {
   addDialogVisible.value = true
   Object.assign(addForm, {
-    productName: '',
-    faceValue: '10'
+    productName: ''
   })
 }
 
@@ -315,8 +284,7 @@ const handleEdit = (row) => {
   editDialogVisible.value = true
   Object.assign(editForm, {
     productId: row.productId,
-    productName: row.productName,
-    faceValue: row.faceValue
+    productName: row.productName
   })
 }
 
